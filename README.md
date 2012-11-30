@@ -36,6 +36,6 @@ World
 * single - num
 * double - num
 * triple - eq
-	-> keep 2 running totals , vertical/horizontal 
+	
 
     
