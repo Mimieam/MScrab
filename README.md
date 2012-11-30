@@ -18,14 +18,14 @@ World
            -> direction
                       
     Other -> Menu
-    	  -> validation
+    	  -> Minimap
+          -> debug Menu
              
 </pre>
     
-Tile types:
-
+#####Tile types:
 * num
-* sign
+* sign (operator & parenteses) 
 * equal
 	-> keep 2 running totals , vertical/horizontal 
     
