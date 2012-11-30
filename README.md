@@ -4,21 +4,28 @@ MScrab
 #####Basic Squeleton
 <pre>
 World
-	Player -> Current Score
-     	   	-> TileHolder
+	Player -> currentScore
+     	   -> tileHolder
  	Board 
-    	   	-> Grid of Tiles
-           		Tiles
-                	-> Type
-                    -> Coodinates
-                    -> value
-                    -> direction
-                    
-           	-> Coordinate ruler (only 4 debugging)
-    
+    	   -> Grid 
+           		-> placeHolder
+           -> Coordinate ruler (only 4 debugging)		
+                
+    Tile
+    	   -> Type
+           -> Coodinates
+           -> value
+           -> direction
+                      
     Other -> Menu
     	  -> validation
              
 </pre>
     
+Tile types:
+
+* num
+* sign
+* equal
+	-> keep 2 running totals , vertical/horizontal 
     
