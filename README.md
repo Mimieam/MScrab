@@ -37,5 +37,8 @@ World
 * double - num
 * triple - eq
 	
+##Rules
+
+ soonn...
 
     
