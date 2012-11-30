@@ -32,4 +32,10 @@ World
 	-> keep 2 running totals , vertical/horizontal 
 
 
+#####placeHolder types:
+* single - num
+* double - num
+* triple - eq
+	-> keep 2 running totals , vertical/horizontal 
+
     
