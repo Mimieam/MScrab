@@ -6,6 +6,8 @@ MScrab
 World
 	Player -> currentScore
      	   -> tileHolder
+           -> timer
+           
  	Board 
     	   -> Grid 
            		-> placeHolder
