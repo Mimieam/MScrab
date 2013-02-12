@@ -445,13 +445,7 @@ var Client = function (name,homeTile) {
 						traverseUsedChip (direction, orientation,getNeighbor(orientation, chip));
 					};
 				}
-			/*	if (direction == "vertical"){
-					orientation = "top";
-					traverseUsedChip (direction,this.usedChip.getNeighbor(orientation, chip));
-					orientation = "botom";
-					this.equation += chip.attr("data-content");
-				}
-				*/
+
 			}
 		
 	};
