@@ -428,31 +428,42 @@ var Client = function (name,homeTile) {
 	}
 
   // inspired by http://stackoverflow.com/a/4580171/623546
-  this.degradingRadiant = function  (argument) {
+  this.degradingRadiant = function  (argument,_time) {
+    console.log(argument);
       var red1 = parseInt(argument,16) >> 16;
       var green1 = (parseInt(argument,16) >> 8) & 0xFF;
       var blue1  =  parseInt(argument,16) & 0xFF;
 
       var time = 0.3; // This should be between 0 and 1
 
-      var outred = time * red1 + (1-time) ;
-      var outgreen = time * green1 + (1-time) ;
-      var outblue = time * blue1 + (1-time) ;
-      var hexColor = ((1 << 24) + (outgreen << 16) + (outblue << 8) + blue).toString(16).substr(1);
-return  hexColor ;
-  }
+      var outred =  red1 * (time) ;
+      var outgreen =  green1 * (time) ;
+      var outblue =  blue1 *(time) ;
+      // var red2 = 0xFFFFFF >> 16;
+      // var green2 = (0xFFFFFF >> 8) & 0xFF;
+      // var blue2  = 0xFFFFFF & 0xFF;
 
+      // var outred = time * red1 + (1-time) * red2;
+      // var outgreen = time * green1 + (1-time) * green2;
+      // var outblue = time * blue1 + (1-time) * blue2;
+       var hexColor = ((1 << 24) + (outred << 16) + (outgreen << 8) + outblue).toString(16).substr(1);
+return  hexColor ;
+  };
+this.lpcnt = 0;
+this.radCol = '7B3F00';
 	this.traverseUsedChip = function (direction,orientation,chip) {
 		var neighbor = chip;
+     this.lpcnt += 0.3;
 		//console.log(neighbor);
 		if (neighbor[0] === undefined)
 			return 0 ;
 		else
-			{
+			{var col ;
 				if (direction == "horizontal"){
 					console.log(this.equation += neighbor.html());
-          neighbor.css({"background-color":"#7B3F00"});
-          console.log(this.degradingRadiant("7B3F00"));
+          console.log( col = this.degradingRadiant(this.radCol ,this.lpcnt));
+          this.radCol = col;
+          neighbor.css({"background-color":"#"+this.radCol});
 					this.traverseUsedChip (direction, orientation,getChipNeighbor(orientation, chip));
 				}
 				else{
