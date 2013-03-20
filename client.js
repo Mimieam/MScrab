@@ -174,12 +174,13 @@ function Tile(T, L, status, type) {
 								//on double click of a chip on the board, remove is from the board and place it back on the rack  --need to be moved somewhere else
 								$('.chip').bind('dblclick ', function(ev, ui) {
 									var $chip = $(this);
-									$chip.attr("data-status","active")
-										 .attr("data-row",null)
-										 .attr("data-col",null);
-										$('#rack').append($(this).css({ position: "relative" }).detach());
-										client.usedChip = client.usedChip.filter(function(v) { return v.attr('id') == $chip.attr('id') ? false: true;}); //remove from usedChip if we remove the chip from the board
-
+									if($chip.attr("data-status")!="disabled") {
+											$chip.attr("data-status","active")
+												 .attr("data-row",null)
+												 .attr("data-col",null);
+											$('#rack').append($(this).css({ position: "relative" }).detach());
+											client.usedChip = client.usedChip.filter(function(v) { return v.attr('id') == $chip.attr('id') ? false: true;}); //remove from usedChip if we remove the chip from the board
+										}
 								});
 
 
@@ -262,7 +263,7 @@ function ChipHolder(_DOM_element) {
 	$(this.DOM_element).css("background-color","red").droppable({accept: 'div.chip' ,   hoverClass: 'hovered',    // need to be somewhere else...
             drop: function (event, ui) {
 							ui.draggable.css({});
-							$(this).css({opacity: 0.8});
+							// $(this).css({opacity: 0.8});
 							event.preventDefault();
 						}
 				});
@@ -526,99 +527,14 @@ var Client = function (name,homeTile) {
 	};
 	this.disable_on_validation = function () {
 		for (var i = 0; i < this.equationChip.length; i++) {
-			this.equationChip[i].draggable("disable").css({opacity: 0.9 ,"background-color":"gray"});  // prevent validated tiles to be moved
+			this.equationChip[i].draggable("disable").css({opacity: 0.9 ,"background-color":"gray","border-color":"dark-gray"});  // prevent validated tiles to be moved
+			this.equationChip[i].attr("data-status","disabled");
 			this.equationChip[i].unbind('dblclick'); // remove dblclick event
 		};
 	}
 	this.parseEquation = function (_myEquation) {
-		return module.exports.parse(_myEquation);  //Peg.js generated grammar
-	// 	var res = 0,
-	// 		aChar,
-	// 		current_Char,
-	// 		maching_parenthesis = 0,
-	// 		previous_Char,
-	// 		next_Char,
-	// 		myEquation = _myEquation.split("|");
-	// 		console.log("Current Ebquation: "+ myEquation);
-	// 	for (var i = 0 ; i <= myEquation.length - 1; i++) {
-
-	// 			if (i > 0) previous_Char = myEquation[i-1];
-	// 			current_Char = myEquation[i];
-	// 			next_Char = myEquation[i+1];
-	// 			if((next_Char !== undefined) && (next_Char !== "")){
-
-	// 				console.log("current - "+current_Char + " next - " + next_Char );
-
-	// 				switch(current_Char){
-	// 					case '+' :
-	// 						if (typeof(next_Char) !== Number || next_Char != '('){
-	// 							console.log("error on addition case");
-	// 						}
-	// 						break;
-
-	// 					case '-' :
-	// 						if (typeof(next_Char) !== Number || next_Char != '('){
-	// 							console.log("error on substraction case");
-	// 						}
-	// 						break;
-
-	// 					case '*' :
-	// 						if (typeof(next_Char) !== Number || next_Char != '('){
-	// 								console.log("error on substraction case");
-	// 							}
-	// 						break;
-
-	// 					case '/' :
-	// 						if (typeof(next_Char) !== Number || next_Char != '('|| next_Char == 0){
-	// 								console.log("error on substraction case");
-	// 							}
-	// 						break;
-
-	// 					case '(' :
-	// 						maching_parenthesis +=1;
-	// 						if (typeof(next_Char) !== Number || next_Char != '('|| next_Char == 0){
-	// 								console.log("error on substraction case");
-	// 							}
-	// 						break;
-
-	// 					case ')' :
-	// 						maching_parenthesis -=1;
-	// 						break;
-
-	// 					case '=' :
-	// 						break;
-	// 					default :
-	// 					//should be a number - might be a negative number
-	// 						try {
-	// 							chr = parseInt(current_Char,10);
-	// 						}
-	// 						catch(e){
-	// 							console.log("unknown character ")
-	// 						}
-	// 				}
-
-	// 				// if (aChar == NaN ){
-	// 				// 	if (myEquation[i++] !== undefined){
-	// 				// 		i++;
-	// 				// 		res = res / myEquation[i];
-	// 				// 	}else {
-	// 				// 		console.log("error : Invalid equation in this.parseEquation()");
-	// 				// 		return  -1;
-	// 				// 	}
-	// 				// }
-	// 				res = res + parseInt(myEquation[i], 10);
-	// 				// console.log(typeof(res)+" res: "+ res);
-	// 				}
-	// 	if (maching_parenthesis != 0){console.log('error - not matching parenthesis');}
-	// 	}; 
-	// 	// for (var i = 0; i < s.length; i++) {
-	// 	//     console.log(s.charAt(i));
-	// 	// }
-	// 	// console.log("final res:"+ res);
+		return module.exports.parse(_myEquation);  //Peg.js generated grammar parser
 	 }
-
-	// // this.
-
 };
 /*================================================================================================*/
 
@@ -632,80 +548,5 @@ test("ChipHolder Test", function () {
 
 		equal(Mimi.getLength(), 1 , "should be 6");
 });
-
-
-
-// $("#board").bind("mousedown touchstart MozTouchDown", function(e) {
-//     if(e.originalEvent.touches && e.originalEvent.touches.length) {
-//         e = e.originalEvent.touches[0];
-//     } else if(e.originalEvent.changedTouches && e.originalEvent.changedTouches.length) {
-//         e = e.originalEvent.changedTouches[0];
-//     }
-// });
-
-
-// $(".Chip").bind("mousedown touchstart MozTouchDown", function(e) {
-//     if(e.originalEvent.touches && e.originalEvent.touches.length) {
-//         e = e.originalEvent.touches[0];
-//     } else if(e.originalEvent.changedTouches && e.originalEvent.changedTouches.length) {
-//         e = e.originalEvent.changedTouches[0];
-//     }
-// });
-
-
-
-// // TESTING SESSION
-// test("Client and Chip Test", function () {
-
-//      width = $('.world').width();
-//      height = $('.world').height();
-//      cell_w = 70;
-//      cell_h = 70;
-//      spacing = 5;
-//      cnt = 0;
-//      TOTALCOLUMN = Math.round(height / cell_h);
-//      TOTALROW = Math.round(width / cell_w);
-
-//     var Miezan = new Client('Miezan',null);
-//     var css = { position: "relative", float:"left",top: 10 + spacing,left: 10 + spacing, width: cell_w,height: cell_h,background: '#B1ADED'};
-
-//    var Home = new Chip(css,null)
-//     deepEqual(Miezan, new Client('Miezan',null), 'good');
-//     equal(Miezan.getScore(), "you've got "+ 0 + " points" , "should be 0")
-//     Miezan.setScore(4);
-//     console.log(Game.show_props(Miezan,'Miezan'));
-//     console.log(Game.show_props(Home,'Chip'));
-//     console.log(Home.GetSelf());
-//     equal(Miezan.getScore(), "you've got "+ 4 + " points" , "should be 0")
-//     equal(Miezan.lastLogin, undefined , "should be undefined")
-//     equal(Miezan.draggedChipId, '0098' , "should be 0098")
-
-// });
-// test("Tile and board Test", function () {
-
-//      width = $('.world').width();
-//      height = $('.world').height();
-//      cell_w = 70;
-//      cell_h = 70;
-//      spacing = 5;
-//      cnt = 0;
-//      TOTALCOLUMN = Math.round(height / cell_h);
-//      TOTALROW = Math.round(width / cell_w);
-
-//     var Miezan = new Client('Miezan',null);
-//     var css = { position: "relative", float:"left",top: 10 + spacing,left: 10 + spacing, width: cell_w,height: cell_h,background: '#B1ADED'};
-
-//    var Home = new Chip(css,null, '001')
-//     deepEqual(Miezan, new Client('Miezan',null), 'good');
-//     equal(Miezan.getScore(), "you've got "+ 0 + " points" , "should be 0")
-//     Miezan.setScore(4);
-//     console.log(Game.show_props(Miezan,'Miezan'));
-//     console.log(Game.show_props(Home,'Chip'));
-//     console.log(Home.GetSelf());
-//     equal(Miezan.getScore(), "you've got "+ 4 + " points" , "should be 0")
-//     equal(Miezan.lastLogin, undefined , "should be undefined")
-//     equal(Miezan.draggedChipId, '0098' , "should be 0098")
-
-// });
 
 });

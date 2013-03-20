@@ -42,7 +42,7 @@ left:30%;
 
 .chip {
 background:white;
-border:2px solid orange;
+border:2px solid #8483af;
 /*z-index:10;*/
 position:relative;
 -webkit-border-radius:5px;
