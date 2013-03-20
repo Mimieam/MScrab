@@ -1,0 +1,15 @@
+{
+  "author": "Miezel",
+  "name": "NetworkingGame",
+  "description": "Simple Client-Server",
+  "version": "0.0.0",
+  "repository": {
+    "url": ""
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}

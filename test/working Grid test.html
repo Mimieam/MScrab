@@ -1,0 +1,54 @@
+<html>
+<head>
+<title>DEMO: Drag and drop Rack using jQuery</title>
+<style type="text/css">
+*{
+padding:0;
+margin:0;
+}
+p{
+margin:10px;
+}
+body{ font-family:Verdana; font-size:12px; }
+.Chip1{background:url("http://placehold.it/85/ffffff/000000/&text=Chip"); width:75px; height:75px; padding:10px; margin:10px; border:1px solid red; float:left;}
+.Chip2{ background:url(http://placehold.it/85/ffffff/000000/&text=Chip); width:75px; height:75px; padding:10px; margin:10px; border:1px solid orange; float:left;}
+.Chip3{background:url(http://placehold.it/85/ffffff/000000/&text=Chip); width:75px; height:75px; padding:10px; margin:10px; border:1px solid yellow; float:left;}  
+  
+  
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/jquery-ui.min.js"></script>
+<script type="text/javascript">
+function itemInSpot(drag_item,spot)
+{
+	var oldSpotItem = $(spot).find('.Chip');
+	if(oldSpotItem.length>0) {
+		oldSpotItem.appendTo('#Rack').draggable({ revert: 'invalid' });
+	}
+	var item = $('<div>');
+	item.attr('class',drag_item.attr('class')).appendTo(spot).draggable({ revert: 'invalid' });
+	drag_item.remove(); // remove the old object
+}
+
+$(document).ready(function() {
+	$(".Chip").draggable({ revert: 'invalid'});
+	$('#Rack').droppable();
+	$(".Tile").droppable({ accept: '.Chip'})
+	$('.Tile').droppable({ accept: '.Chip'});
+	$('.Tile,#Rack').bind('drop', function(ev,ui) { itemInSpot(ui.draggable,this); });
+});
+</script>
+</head>
+<body>
+ <div class="world"> 
+<div class="Tile" style="background:url(http://placehold.it/85/ffffff/000000/&text=Tile); width:75px; padding:10px; height:75px; margin:10px; border:1px solid black; float:left;"></div>
+<div class="Tile" style="background:url(http://placehold.it/85/ffffff/000000/&text=Tile); width:75px; height:75px; padding:10px; margin:10px; border:1px solid black; float:left;"></div>
+  </div>
+<div id="Rack" style="background:url(http://placehold.it/300/fff/000&text=Rack); width:300px; height:150px; margin:10px; padding:15px; border:1px solid black; display:block; clear:both;">
+	<div  class="Chip Chip1" ></div>
+	<div   class="Chip Chip2"  ></div>
+	<div   class="Chip Chip3"   ></div>
+</div>
+ 
+</body>
+</html>

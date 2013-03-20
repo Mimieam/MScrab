@@ -1,2 +1,12 @@
+Millestone:
+ ☐ Equation validation
+ ☐ Map rendering
+     ☐ infinite map
+     ☐ tile coloring
+ ☐ Network data formating
+Bug:
+ ☐ Validation equation need more testing
+ ☐ 
+ ☐ 
 Tools:
  ☐ Texture Packer = > create a atlas(or sprite sheet) from lots of images

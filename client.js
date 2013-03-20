@@ -432,8 +432,9 @@ var Client = function (name,homeTile) {
 		else
 			{var col ;
 				if (direction == "horizontal"){
-		          console.log( col = this.degradingRadiant("7B3F00 ",this.lpcnt));
-		          neighbor.css({"background-color":col});
+		          // console.log( col = this.degradingRadiant("7B3F00 ",this.lpcnt));
+		          // neighbor.css({"background-color":col});
+		          neighbor.css({"background-color":"chocolate"}); //evaluation color
 		          console.log("orientation " + orientation);
           			if (orientation == "left"){
 
@@ -508,24 +509,29 @@ var Client = function (name,homeTile) {
 			}
 
 		}
-		// console.log(999+  parseInt("-1000", 10));
 		console.log("let's parse the equation: ");
-		//console.log(this.equationChip);
 		var equation = this.equation.replace(/\|/g,'')
 		console.log(equation);
 		var result = this.parseEquation(equation);
 		console.log(result);
 		if (1){
 			this.rack.reset();
+			this.disable_on_validation();
 			this.rack.makeNewSet(5,2,1);
 			this.rack.getChips();
 		}
 		this.equation = "";
+		console.log(this.equationChip);
 		this.equationChip = [];
 	};
-
+	this.disable_on_validation = function () {
+		for (var i = 0; i < this.equationChip.length; i++) {
+			this.equationChip[i].draggable("disable").css({opacity: 0.9 ,"background-color":"gray"});  // prevent validated tiles to be moved
+			this.equationChip[i].unbind('dblclick'); // remove dblclick event
+		};
+	}
 	this.parseEquation = function (_myEquation) {
-		return module.exports.parse(_myEquation);
+		return module.exports.parse(_myEquation);  //Peg.js generated grammar
 	// 	var res = 0,
 	// 		aChar,
 	// 		current_Char,

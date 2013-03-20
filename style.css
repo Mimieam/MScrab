@@ -45,8 +45,8 @@ background:white;
 border:2px solid orange;
 /*z-index:10;*/
 position:relative;
--webkit-border-radius:10px;
-border-radius:10px;
+-webkit-border-radius:5px;
+border-radius:5px;
 -moz-box-shadow:0 0 .3em rgba(0,0,0,.8);
 -webkit-box-shadow:0 0 .3em rgba(0,0,0,.8);
 box-shadow:0 0 .3em rgba(0,0,0,.8);
@@ -55,7 +55,8 @@ box-shadow:0 0 .3em rgba(0,0,0,.8);
 .tile {
 /* background:#BADA55; */
 background:black;
-border:1px dotted #0D0D0D;
+/*border:1px dotted #0D0D0D;*/
+border:1px dotted  rgb(37, 37, 37);
 /*z-index:0;*/
 position:absolute;
 }
