@@ -6,6 +6,8 @@ padding:0;
 button {
 position:fixed;
 z-index:100;
+bottom: 2.4em;
+left: 75%;
 }
 
 body {
@@ -207,7 +209,7 @@ body{
 
 }
 
-/* Make me pretty! */
+
 body {
     font: 12px Ubuntu, Arial, sans-serif;
 }
