@@ -50,8 +50,35 @@ Game.getParentheses = function (orientation) {
 		return "(";
 	if (orientation == "right")
 		return ")";
-}
+};
+/* thanks to http://www.javascripter.net/faq/browserw.htm */
+Game.getBrowserDimension = function  (argument) {
+	var winW = 630, winH = 460;
+	if (document.body && document.body.offsetWidth) {
+	 winW = document.body.offsetWidth;
+	 winH = document.body.offsetHeight;
+	}
+	if (document.compatMode=='CSS1Compat' &&
+	    document.documentElement &&
+	    document.documentElement.offsetWidth ) {
+	 winW = document.documentElement.offsetWidth;
+	 winH = document.documentElement.offsetHeight;
+	}
+	if (window.innerWidth && window.innerHeight) {
+	 winW = window.innerWidth;
+	 winH = window.innerHeight;
+	}
+	var  dim = {
+		"width":winW,
+		"height":winH
+	};
 
+	return dim;
+};
+Game.viewport = Game.getBrowserDimension(); 
+Game.setWorldDim = function () {
+	$('.world').css({"width":Game.viewport.x,"height":Game.viewport.y,"background-color":"green"});
+}
 /*================================================================================================*/
 function Chip(type,value) {
 	'use strict';
@@ -229,14 +256,19 @@ function Region(name, startPt, endPt, Rule){
 5 = star
 */
 
-function Board (divName,w ,h) {
+/*
+board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
+*/
+function Board (divName,r,c,ch,cw,w,h) {
 			this.width = w || $(divName).width();
 			this.height = h || $(divName).height();
+			CSSs.cell_h = ch || CSSs.cell_h;
+			CSSs.cell_w = cw || CSSs.cell_w;
 			this.cnt = 0;
 			this.tileSet = [];
 			this.patternStr = "";
-			this.cols = Math.floor(this.height / CSSs.cell_h);
-			this.rows = Math.floor(this.width / CSSs.cell_w);
+			this.cols = c || Math.floor(this.height / CSSs.cell_h);
+			this.rows = r || Math.floor(this.width / CSSs.cell_w);
 			this.pattern =[[4,0,0,1,0,0,0,4,0,0,0,1,0,0,4],
 				           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
 				           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
@@ -252,7 +284,6 @@ function Board (divName,w ,h) {
 				           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
 				           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
 				           [4,0,0,1,0,0,0,4,0,0,0,1,0,0,4]];
-
 }
 
 Board.prototype = {
@@ -274,47 +305,47 @@ Board.prototype = {
 	},
 	applyPattern:function (tile,x,y) {
 		// console.log($("#"+tile.id+""));
-		var r = x%15;  // 15  = # of columns of pattern
-		var c = y%15; //  well here its the number of row
+		var r = x%14;  // 15 -1 = # of columns of pattern -1 to wrap onto the next
+		var c = y%14; //  well here its the number of row
 		for (var row in this.pattern){
 		   for  (var cell in row ){
 		   			if ( 0 == this.pattern[r][c]){
-		   				$(tile).css({"background-color":"blue"});
+		   				$(tile).css({});
 		   			}
 		   			if ( 1 == this.pattern[r][c]){
-		   				$(tile).css({"background-color":"red"});
+		   				$(tile).css({"background-color":"red","color":"white"}).text("x2");
 		   			}
 		   			if ( 2 == this.pattern[r][c]){
-		   				$(tile).css({"background-color":"yellow"});
+		   				$(tile).css({"background-color":"yellow","color":"white"}).text("x3");
 		   			}
 		   			if ( 3 == this.pattern[r][c]){
-		   				$(tile).css({"background-color":"pink"});
+		   				$(tile).css({"background-color":"pink","color":"white"}).text("+4");
 		   			}
 		   			if ( 4 == this.pattern[r][c]){
-		   				$(tile).css({"background-color":"turquoise"});
+		   				$(tile).css({"background-color":"turquoise","color":"white"}).text("+2");
 		   			}
 		   			if ( 5 == this.pattern[r][c]){
-		   				$(tile).css({"background-color":"chocolate"});
+		   				$(tile).css({"background-color":"chocolate","color":"white"}).text("x10");
 		   			}
 
 				 // console.log(this.pattern[row][cell]);
 
 		   }
 		}
-		console.log($(tile));
+		// console.log($(tile));
 	},
-	applyColor:function () {
-		console.log("total row"+this.rows + "total cols" + this.cols);
-		for (var i = 0; i < this.rows; i ++) {
-			for (var j = 0; j < this.cols; j ++) {
-				var elem = document.elementFromPoint(i * (CSSs.cell_w + CSSs.spacing), j * (CSSs.cell_w + CSSs.spacing)); // x, y
-				elem.style.background = "#ccc";
-				console.log("row "+ i + "col " + j);
-				console.log(elem);
-			}
-				console.log(i);
-		}
-	}
+	// applyColor:function () {
+	// 	console.log("total row"+this.rows + "total cols" + this.cols);
+	// 	for (var i = 0; i < this.rows; i ++) {
+	// 		for (var j = 0; j < this.cols; j ++) {
+	// 			var elem = document.elementFromPoint(i * (CSSs.cell_w + CSSs.spacing), j * (CSSs.cell_w + CSSs.spacing)); // x, y
+	// 			elem.style.background = "#ccc";
+	// 			console.log("row "+ i + "col " + j);
+	// 			console.log(elem);
+	// 		}
+	// 			console.log(i);
+	// 	}
+	// }
 };
 /*================================================================================================*/
 function ChipHolder(_DOM_element) {
@@ -599,11 +630,12 @@ var Client = function (name,homeTile) {
 };
 /*================================================================================================*/
 
-
+// board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
 //test("ChipHolder Test", function () {
 	Mimi = new Client("Mimi");
-	var myBoard = new Board("#board",1000,1000);
+	var myBoard = new Board("#board",15,10);
 	myBoard.buildGrid("#board",CSSs);
+	Game.setWorldDim();
 	//myBoard.applyPattern();
 	// myBoard.applyColor();
 	$('#board').draggable();

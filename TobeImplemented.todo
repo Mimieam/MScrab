@@ -2,6 +2,7 @@ Millestone:
  ☐ Equation validation
    ✔ simple implementation @done (13-03-20 19:28)
    ☐ checking all side of each tile for possible side equations
+   ☐ add tile weight before computing
 
  ☐ Map rendering
    ✔ basic map @done (13-03-20 19:28)
