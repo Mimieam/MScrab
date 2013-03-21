@@ -10,11 +10,6 @@ var CSSs = new (function  () {
 	this.top =0;
 	this.Chip = { zIndex:"0", position: "relative", float:"left",top: 10 + this.spacing,left: 10 + this.spacing, width: this.cell_w,height: this.cell_h,background: this.ChipColor };
 	this.Tile = {zIndex:"0", position: "absolute", width: this.cell_w,height: this.cell_h,background: this.TilesColor, top: this.top ,left: this.left };
-
-		this.SetTop = function(x) {
-			this.top = x;
-		};
-
 }) ();
 
 /*================================================================================================*/
@@ -62,10 +57,10 @@ function Chip(type,value) {
 	'use strict';
 	Game.chipCnt++;
 	this.type = type || "regular";
-		this.content = value || 0;
-		this.row = null;  //row and col of the current used tile
-		this.col = null;
-		this.status = "active"; // active or desactivated if accepted by validation
+	this.content = value || 0;
+	this.row = null;  //row and col of the current used tile
+	this.col = null;
+	this.status = "active"; // active or desactivated if accepted by validation
 	var self = $('<div />').addClass("chip")
 							.css(CSSs.Chip)
 								.attr('id', 'chip_' + Game.chipCnt)
@@ -90,19 +85,19 @@ function Chip(type,value) {
 		return self;
 	}
 
-					//priviledged
-		this.GetSelf = function() {
-			return pGetSelf();
-		};
+				//priviledged
+	this.GetSelf = function() {
+		return pGetSelf();
+	};
 
-		this.SetRowAndCol = function(row,col){
-			this.row = row;
-			this.col = col;
-		};
+	this.SetRowAndCol = function(row,col){
+		this.row = row;
+		this.col = col;
+	};
 
-		this.ToJson = function(){
-			return {"type":this.type,"content":this.content, "status":this.status, "row":this.row, "col":this.col};
-		};
+	this.ToJson = function(){
+		return {"type":this.type,"content":this.content, "status":this.status, "row":this.row, "col":this.col};
+	};
 
 
 
@@ -225,6 +220,15 @@ function Region(name, startPt, endPt, Rule){
 }
 
 /*================================================================================================*/
+/*
+0 = empty
+1 = double number score
+2 = triple number score
+3 = double equation score
+4 = triple equation scores
+5 = star
+*/
+
 function Board (divName,w ,h) {
 			this.width = w || $(divName).width();
 			this.height = h || $(divName).height();
@@ -233,6 +237,21 @@ function Board (divName,w ,h) {
 			this.patternStr = "";
 			this.cols = Math.floor(this.height / CSSs.cell_h);
 			this.rows = Math.floor(this.width / CSSs.cell_w);
+			this.pattern =[[4,0,0,1,0,0,0,4,0,0,0,1,0,0,4],
+				           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
+				           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
+				           [1,0,0,3,0,0,0,1,0,0,0,3,0,0,1],
+				           [0,0,0,0,3,0,0,0,0,0,3,0,0,0,0],
+				           [0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+				           [0,0,1,0,0,0,1,0,1,0,0,0,1,0,0],
+				           [4,0,0,1,0,0,0,5,0,0,0,1,0,0,4],
+				           [0,0,1,0,0,0,1,0,1,0,0,0,1,0,0],
+				           [0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+				           [0,0,0,0,3,0,0,0,0,0,3,0,0,0,0],
+				           [1,0,0,3,0,0,0,1,0,0,0,3,0,0,1],
+				           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
+				           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
+				           [4,0,0,1,0,0,0,4,0,0,0,1,0,0,4]];
 
 }
 
@@ -242,16 +261,60 @@ Board.prototype = {
 		var grid = "";
 		for (var i = 0; i < this.rows; i ++) {
 				for (var j = 0; j < this.cols; j ++) {
-				CSSs.Tile['top'] =  i * (CSSs.cell_w + CSSs.spacing);
-								CSSs.Tile['left']  = j * (CSSs.cell_w + CSSs.spacing);
-								t = (new Tile(i,j)).GetSelf() ;
-								grid += t[0].outerHTML;
-							this.cnt++;
+					CSSs.Tile['top'] =  i * (CSSs.cell_w + CSSs.spacing);
+					CSSs.Tile['left']  = j * (CSSs.cell_w + CSSs.spacing);
+					t = (new Tile(i,j)).GetSelf() ;
+					this.applyPattern(t,i,j);
+					grid += t[0].outerHTML;
+					this.cnt++;
+					// if (true) {};
 				}
 			}
-			$(divName)[0].innerHTML = grid;
-	}
+		$(divName)[0].innerHTML = grid;
+	},
+	applyPattern:function (tile,x,y) {
+		// console.log($("#"+tile.id+""));
+		var r = x%15;  // 15  = # of columns of pattern
+		var c = y%15; //  well here its the number of row
+		for (var row in this.pattern){
+		   for  (var cell in row ){
+		   			if ( 0 == this.pattern[r][c]){
+		   				$(tile).css({"background-color":"blue"});
+		   			}
+		   			if ( 1 == this.pattern[r][c]){
+		   				$(tile).css({"background-color":"red"});
+		   			}
+		   			if ( 2 == this.pattern[r][c]){
+		   				$(tile).css({"background-color":"yellow"});
+		   			}
+		   			if ( 3 == this.pattern[r][c]){
+		   				$(tile).css({"background-color":"pink"});
+		   			}
+		   			if ( 4 == this.pattern[r][c]){
+		   				$(tile).css({"background-color":"turquoise"});
+		   			}
+		   			if ( 5 == this.pattern[r][c]){
+		   				$(tile).css({"background-color":"chocolate"});
+		   			}
 
+				 // console.log(this.pattern[row][cell]);
+
+		   }
+		}
+		console.log($(tile));
+	},
+	applyColor:function () {
+		console.log("total row"+this.rows + "total cols" + this.cols);
+		for (var i = 0; i < this.rows; i ++) {
+			for (var j = 0; j < this.cols; j ++) {
+				var elem = document.elementFromPoint(i * (CSSs.cell_w + CSSs.spacing), j * (CSSs.cell_w + CSSs.spacing)); // x, y
+				elem.style.background = "#ccc";
+				console.log("row "+ i + "col " + j);
+				console.log(elem);
+			}
+				console.log(i);
+		}
+	}
 };
 /*================================================================================================*/
 function ChipHolder(_DOM_element) {
@@ -468,9 +531,7 @@ var Client = function (name,homeTile) {
 	          			}
 					}
 				}
-
 			}
-
 		};
 
 	/* we are going from the last chip*/
@@ -490,10 +551,10 @@ var Client = function (name,homeTile) {
 			if ((LN.length === 0 ? (RN.length === 0 ? false : true) : true )){
 				direction = "horizontal";
 				this.traverseUsedChip (direction,"left",LN);
-				
+
 				//collect the chip for validation
 				this.equationChip.push(this.usedChip[this.usedChip.length -1 ]);
-				console.log(this.equation += $(this.usedChip[this.usedChip.length -1 ]).html()+"|");	
+				console.log(this.equation += $(this.usedChip[this.usedChip.length -1 ]).html()+"|");
 
 				this.traverseUsedChip (direction,"right",RN);
 			}
@@ -504,7 +565,7 @@ var Client = function (name,homeTile) {
 
 					this.equationChip.push(this.usedChip[this.usedChip.length -1 ]);
 					console.log(this.equation += $(this.usedChip[this.usedChip.length -1 ]).html()+"|");
-					
+
 					this.traverseUsedChip (direction,"bottom",BN);
 				}
 			}
@@ -515,7 +576,7 @@ var Client = function (name,homeTile) {
 		console.log(equation);
 		var result = this.parseEquation(equation);
 		console.log(result);
-		if (1){
+		if (1){//  vadiation condition
 			this.rack.reset();
 			this.disable_on_validation();
 			this.rack.makeNewSet(5,2,1);
@@ -539,14 +600,16 @@ var Client = function (name,homeTile) {
 /*================================================================================================*/
 
 
-test("ChipHolder Test", function () {
+//test("ChipHolder Test", function () {
 	Mimi = new Client("Mimi");
 	var myBoard = new Board("#board",1000,1000);
 	myBoard.buildGrid("#board",CSSs);
+	//myBoard.applyPattern();
+	// myBoard.applyColor();
 	$('#board').draggable();
 	(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
 
-		equal(Mimi.getLength(), 1 , "should be 6");
-});
+		// equal(Mimi.getLength(), 1 , "should be 6");
+//});
 
 });

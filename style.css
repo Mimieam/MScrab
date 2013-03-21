@@ -166,10 +166,10 @@ body{
   margin-top:-0.5cm;//-4.75em;
   -webkit-transform-origin:0%;
   -webkit-transform: rotate(90deg) ;  
-     -moz-transform: rotate(7.5deg); 
-      -ms-transform: rotate(7.5deg); 
-       -o-transform: rotate(7.5deg); 
-          transform: rotate(7.5deg); 
+     -moz-transform: rotate(90deg); 
+      -ms-transform: rotate(90deg); 
+       -o-transform: rotate(90deg); 
+          transform: rotate(90deg); 
 } 
 
 .vertical li {

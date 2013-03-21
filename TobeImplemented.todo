@@ -1,12 +1,28 @@
 Millestone:
  ☐ Equation validation
+   ✔ simple implementation @done (13-03-20 19:28)
+   ☐ checking all side of each tile for possible side equations
+
  ☐ Map rendering
-     ☐ infinite map
-     ☐ tile coloring
+   ✔ basic map @done (13-03-20 19:28)
+   ☐ infinite map
+   ✔ tile coloring @done (13-03-21 08:40)
+     ☐ make it prettier
+   ☐ Special tiles with weight
+
  ☐ Network data formating
+   ☐ use json format
+
+ ☐ Scoring
+   ☐ computation
+   ☐ animation
+
+ ☐ Tunning
+   ☐ better color for background and border (need designer help)
+   ☐
 Bug:
  ☐ Validation equation need more testing
- ☐ 
- ☐ 
+ ☐
+ ☐
 Tools:
  ☐ Texture Packer = > create a atlas(or sprite sheet) from lots of images
