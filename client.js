@@ -306,8 +306,8 @@ function Board (divName,r,c,ch,cw,w,h) {
 			};
 
 			this.vertical_marker =  {
-				"x": 0,
-				"y": (this.bottom_left_corner - this.top_left_corner)/2
+				"x": (this.bottom_left_corner.x - this.top_left_corner.x)/2,
+				"y": 0
 			};
 
 			this.top_right_corner =  {
@@ -320,9 +320,9 @@ function Board (divName,r,c,ch,cw,w,h) {
 				"y": r*(CSSs.cell_w + CSSs.spacing)
 			};
 
-			this.horizontal_Left =  {
-				"x": (this.bottom_left_corner - this.top_left_corner)/2,
-				"y": 0
+			this.horizontal_marker =  {
+				"x": 0,
+				"y": (this.bottom_left_corner.y - this.top_left_corner.y)/2
 			};
 
 }
@@ -382,13 +382,27 @@ Board.prototype = {
 		   				$(tile).addClass("star").text("x10");
 		   			break;
 
-		   			}
+		   		}
 		   }
 		}
 	},
-	update:function(event, ui) {  //bind this to board dragged 
-		console.log("HELP I'M BEING DRAGGED");
+	update:function(event, ui) {  //board drag function handler
+
+//this here reference the jquery draggable object - the board div and not the the board object as defined above. So to access the markers i need to use a global variable - could be improved like by putting the all the board markers, into data-attribute and getting them from ui
+
+		console.log("horizontal_marker: "+ myBoard.horizontal_marker.y );
+		console.log(ui.position);
+
+
+		// if(ui.position.top < this.horizontal_marker.y ){
+		// 	console.log("generate more map above");
+		// }
+		// if(ui.position.top > this.horizontal_marker.y ){
+		// 	console.log("generate more map bellow");
+		// }
 		
+
+
 	}
 };
 /*================================================================================================*/
@@ -682,7 +696,7 @@ var Client = function (name,homeTile) {
 	var myBoard = new Board("#board",15,35);
 	myBoard.buildGrid("#board",CSSs);
 	Game.setWorldDim();
-	$('#board').draggable({
+	$('#board').draggable({ //will be move into Board class soon
 		drag: myBoard.update
 	});
 	(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
