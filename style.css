@@ -1,73 +1,111 @@
 div {
-margin:0;
-padding:0;
+    margin:0;
+    padding:0;
 }
 
 button {
-position:fixed;
-z-index:100;
-bottom: 2.4em;
-left: 75%;
+    position:fixed;
+    z-index:100;
+    bottom: 2.4em;
+    left: 75%;
 }
 
 body {
-margin:0px;
-background:black;
-overflow-y:hidden;
-overflow-x:hidden;
+    margin:0px;
+    background:black;
+    overflow-y:hidden;
+    overflow-x:hidden;
 }
 
 #board {
-background:black;
-width:1024px;
-height:768px;
-
-/*top:0;
-left:0;*/
+    width:1024px;
+    height:768px;
 }
+
 /*viewport*/
-.world {  
-background:black;
-width:1024px;
-height:768px;
-overflow:hidden;
+.world {
+    /*background:orange;*/
+    width:1024px;
+    height:768px;
+    overflow:hidden;
+    margin: 0 auto;
+    background: -webkit-linear-gradient(63deg, #151515 5px, transparent 5px) 0 5px, -webkit-linear-gradient(-117deg, #151515 5px, transparent 5px) 10px 0px, -webkit-linear-gradient(63deg, #222 5px, transparent 5px) 0px 10px, -webkit-linear-gradient(-117deg, #222 5px, transparent 5px) 10px 5px, -webkit-linear-gradient(0deg, #1b1b1b 10px, transparent 10px), -webkit-linear-gradient(#1d1d1d 25%, #1a1a1a 25%, #1a1a1a 50%, transparent 50%, transparent 75%, #242424 75%, #242424);
+    background-color: #131313;
+    background-size: 20px 20px;
 }
 
 
 .tile,.chip {
-font-size: 33px;
-top:30%;
-left:30%;	
+    font-size: 33px;
+    top:30%;
+    left:30%;
 }
 
 .chip {
-background:white;
-border:2px solid #8483af;
-/*z-index:10;*/
-position:relative;
--webkit-border-radius:5px;
-border-radius:5px;
--moz-box-shadow:0 0 .3em rgba(0,0,0,.8);
--webkit-box-shadow:0 0 .3em rgba(0,0,0,.8);
-box-shadow:0 0 .3em rgba(0,0,0,.8);
+    background:white;
+    border:2px solid #8483af;
+    position:relative;
+    -webkit-border-radius:5px;
+            border-radius:5px;
+    -webkit-box-shadow:0 0 .3em rgba(0,0,0,.8);
+       -moz-box-shadow:0 0 .3em rgba(0,0,0,.8);
+            box-shadow:0 0 .3em rgba(0,0,0,.8);
 }
 
 .tile {
-/* background:#BADA55; */
-background:black;
-/*border:1px dotted #0D0D0D;*/
-border:1px dotted  rgb(37, 37, 37);
-/*z-index:0;*/
-position:absolute;
+    background:black;
+    border:1px dotted  rgb(37, 37, 37);
+    position:absolute;
 }
 
+/*0 = empty
+1 = double number score
+2 = triple number score
+3 = double equation score
+4 = triple equation scores
+5 = star
+
+*/
+.dbl_number, .tpl_number ,
+.dbl_equation, .tpl_equation, .star, .empty{
+    color:white;
+/*background-color: #026873;*/
+background-image: -webkit-linear-gradient(0deg, rgba(255,255,255,.07) 50%, transparent 50%), -webkit-linear-gradient(0deg, rgba(255,255,255,.13) 50%, transparent 50%), -webkit-linear-gradient(0deg, transparent 50%, rgba(255,255,255,.17) 50%), -webkit-linear-gradient(0deg, transparent 50%, rgba(255,255,255,.19) 50%);
+background-size: 13px, 29px, 37px, 53px;
+/*background-color: #026873;*/
+background-image: -webkit-linear-gradient(0deg, rgba(255,255,255,.07) 50%, transparent 50%), -webkit-linear-gradient(0deg, rgba(255,255,255,.13) 50%, transparent 50%), -webkit-linear-gradient(0deg, transparent 50%, rgba(255,255,255,.17) 50%), -webkit-linear-gradient(0deg, transparent 50%, rgba(255,255,255,.19) 50%);
+background-size: 13px, 29px, 37px, 53px;
+}
+
+.empty{
+    background-color:wood;
+}
+.dbl_number {
+    background-color:yellow;
+}
+.tpl_number{
+    background-color:pink;
+}
+.dbl_equation{
+    background-color:turquoise;
+}
+.tpl_equation{
+    background-color:red;
+}
+.star {
+    background-color:gold;
+}
+
+
+
+
 .hovered {
-background:#1A1A1A;
-opacity: 0.5;
+    background:#1A1A1A;
+    opacity: 0.5;
 }
 
 .validated {
-background:orange;
+    background:orange;
 }
 
 /*#viewport {
@@ -83,27 +121,26 @@ pointer-events:none;
 }*/
 
 #rack {
-/*z-index:5;*/
-/*background:transparent;*/
-border:2px solid #8483af;
-width:50%;
-height:15%;
-top:80%;
-left:25%;
-position:fixed;
+    /*z-index:5;*/
+    /*background:transparent;*/
+    border:2px solid #8483af;
+    width:50%;
+    height:15%;
+    top:80%;
+    left:25%;
+    position:fixed;
 }
 
 <!-- Include he following conditional to get click-throughs to work with IE -->
 <!--[if IE]>
-<style type="text/css">
 body {
--ms-overflow-y:hidden;
--ms-overflow-x:hidden;
+    -ms-overflow-y:hidden;
+    -ms-overflow-x:hidden;
 }
 
 .sample {
-filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='sample_600x600.png',sizingMethod='scale');
-background:none!important;
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='sample_600x600.png',sizingMethod='scale');
+    background:none!important;
 }
 
 
@@ -123,15 +160,34 @@ div.transform-v-x{
 }
 
 
+.pattern {
+    background: -webkit-radial-gradient(black 15%, transparent 16%) 0 0, -webkit-radial-gradient(black 15%, transparent 16%) 8px 8px, -webkit-radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px, -webkit-radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px;
+    background-color: #282828;
+    background-size: 16px 16px;
+}
+
+.pattern2 {
+    background: -webkit-linear-gradient(63deg, #151515 5px, transparent 5px) 0 5px, -webkit-linear-gradient(-117deg, #151515 5px, transparent 5px) 10px 0px, -webkit-linear-gradient(63deg, #222 5px, transparent 5px) 0px 10px, -webkit-linear-gradient(-117deg, #222 5px, transparent 5px) 10px 5px, -webkit-linear-gradient(0deg, #1b1b1b 10px, transparent 10px), -webkit-linear-gradient(#1d1d1d 25%, #1a1a1a 25%, #1a1a1a 50%, transparent 50%, transparent 75%, #242424 75%, #242424);
+    background-color: #131313;
+    background-size: 20px 20px;
+}
+
+.bluePrint{
+    background-color: #269;
+    background-image: -webkit-linear-gradient(white 2px, transparent 2px), -webkit-linear-gradient(0deg, white 2px, transparent 2px), -webkit-linear-gradient(rgba(255,255,255,.3) 1px, transparent 1px), -webkit-linear-gradient(0deg, rgba(255,255,255,.3) 1px, transparent 1px);
+    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+}
+
 /*RULES*/
-.ruler, .ruler li {
+/*.ruler, .ruler li {
     margin: 0;
     padding: 0;
     list-style: none;
     display: inline-block;
-}
+}*/
 /* IE6-7 Fix */
-.ruler, .ruler li {
+/*.ruler, .ruler li {
     *display: inline;
 }
 body{
@@ -152,32 +208,32 @@ body{
     white-space: nowrap;
     z-index: 20;
 
- 
-}
 
+}*/
+/*
 .horizontal{
 //  margin-top:-0.5cm;//-4.75em;
  // margin-left:-0.5cm;//1.6em;
 }
-
-.vertical {
+*/
+/*.vertical {
   position:absolute;
   margin-left:0.5cm;//1.6em;
   margin-top:-0.5cm;//-4.75em;
   -webkit-transform-origin:0%;
-  -webkit-transform: rotate(90deg) ;  
-     -moz-transform: rotate(90deg); 
-      -ms-transform: rotate(90deg); 
-       -o-transform: rotate(90deg); 
-          transform: rotate(90deg); 
-} 
+  -webkit-transform: rotate(90deg) ;
+     -moz-transform: rotate(90deg);
+      -ms-transform: rotate(90deg);
+       -o-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
 
 .vertical li {
-//  -webkit-transform: rotate(-90deg); 
+//  -webkit-transform: rotate(-90deg);
 }
 
 .vertical li:before {
-   -webkit-transform: rotate(0deg);   
+   -webkit-transform: rotate(0deg);
 }
 
 .ruler li {
@@ -187,7 +243,7 @@ body{
     text-align: center;
     position: relative;
     text-shadow: 1px 1px hsl(60, 60%, 84%);
-   
+
 }
 .ruler li:before {
     content: '';
@@ -196,7 +252,7 @@ body{
     height: .64em;
     top: -.64em;
     right: 1em;
-   
+
 }
 
 #config{
@@ -214,3 +270,4 @@ body{
 body {
     font: 12px Ubuntu, Arial, sans-serif;
 }
+*/
