@@ -138,110 +138,110 @@ function Chip(type,value) {
 
 /*================================================================================================*/
 function Tile(T, L, status, type) {
-		'use strict';
-		Game.tileCnt++;
-		this.id = 'tile_' + Game.tileCnt;
-		this.type = type || "normal";
-		// this.content = value||0 ;
-		this.col = L; // tile coordinate on the board ( top, left)
-		this.row = T;
-		this.status = status || "free";
-		var self = $('<div />').addClass("tile").css(CSSs.Tile).addClass("ui-droppable").attr({
-				"id": this.id,
-				"type": this.type,
-				"status": this.status,
-				"row": this.row,
-				"col": this.col
-		});
-		//.text(this.id)
-		//private
+	'use strict';
+	Game.tileCnt++;
+	this.id = 'tile_' + Game.tileCnt;
+	this.type = type || "normal";
+	// this.content = value||0 ;
+	this.col = L; // tile coordinate on the board ( top, left)
+	this.row = T;
+	this.status = status || "free";
+	var self = $('<div />').addClass("tile").css(CSSs.Tile).addClass("ui-droppable").attr({
+			"id": this.id,
+			"type": this.type,
+			"status": this.status,
+			"row": this.row,
+			"col": this.col
+	});
+	//.text(this.id)
+	//private
 
-		function pGetSelf() {
-				return self;
-		}
-		//priviledged
-		this.GetSelf = function() {
-				return pGetSelf();
-		};
+	function pGetSelf() {
+			return self;
+	}
+	//priviledged
+	this.GetSelf = function() {
+			return pGetSelf();
+	};
 
-		this.getFullNeighbor = function() {
-				var neighbor = [];
-				//if ( this.col + 1)
-		};
+	this.getFullNeighbor = function() {
+			var neighbor = [];
+			//if ( this.col + 1)
+	};
 
-		this.makeAllTileDroppable = function(divs, client) {
-				$(divs).droppable({
-						accept: 'div.chip',
-						hoverClass: 'hovered',
-						drop: function(event, ui) {
+	this.makeAllTileDroppable = function(divs, client) {
+			$(divs).droppable({
+					accept: 'div.chip',
+					hoverClass: 'hovered',
+					drop: function(event, ui) {
 
-								ui.draggable.attr('data-droppedIn', this.id);
-								ui.draggable.attr('data-row', $(this).attr('row'));
-								ui.draggable.attr('data-col', $(this).attr('col'));
-								console.log(ui.draggable.attr("id") + " with value: " + ui.draggable.data("content") + " is in " + ui.draggable.attr('data-droppedIn'));
-								console.log(ui.draggable.attr("data-row") + " - " + ui.draggable.attr('data-col'));
-								console.log($(this).attr('col'));
-								console.log($(this).attr('row'));
-								console.log(client.name);
+							ui.draggable.attr('data-droppedIn', this.id);
+							ui.draggable.attr('data-row', $(this).attr('row'));
+							ui.draggable.attr('data-col', $(this).attr('col'));
+							console.log(ui.draggable.attr("id") + " with value: " + ui.draggable.data("content") + " is in " + ui.draggable.attr('data-droppedIn'));
+							console.log(ui.draggable.attr("data-row") + " - " + ui.draggable.attr('data-col'));
+							console.log($(this).attr('col'));
+							console.log($(this).attr('row'));
+							console.log(client.name);
 
-								if ($.inArray(ui.draggable, client.usedChip) == -1){
-									client.usedChip.push(ui.draggable);
-								}
-								console.log(client.usedChip.length);
-								console.log(client.usedTile.length);
-								// if(!$(this).hasClass("transform-h-x"))  // just messing around with 2.5D
-								//$(".tile").addClass('transform-h-x');
+							if ($.inArray(ui.draggable, client.usedChip) == -1){
+								client.usedChip.push(ui.draggable);
+							}
+							console.log(client.usedChip.length);
+							console.log(client.usedTile.length);
+							// if(!$(this).hasClass("transform-h-x"))  // just messing around with 2.5D
+							//$(".tile").addClass('transform-h-x');
 
-								//on double click of a chip on the board, remove is from the board and place it back on the rack  --need to be moved somewhere else
-								// $('.chip').bind('dblclick ', function(ev, ui) {
-								// 	var $chip = $(this);
-								// 	if($chip.attr("data-status")!="disabled") {
-								// 			$chip.attr("data-status","active")
-								// 				 .attr("data-row",null)
-								// 				 .attr("data-col",null);
-								// 			$('#rack').append($(this).css({ position: "relative" }).detach());
-								// 			client.usedChip = client.usedChip.filter(function(v) { return v.attr('id') == $chip.attr('id') ? false: true;}); //remove from usedChip if we remove the chip from the board
-								// 		}
-								// });
+							//on double click of a chip on the board, remove is from the board and place it back on the rack  --need to be moved somewhere else
+							// $('.chip').bind('dblclick ', function(ev, ui) {
+							// 	var $chip = $(this);
+							// 	if($chip.attr("data-status")!="disabled") {
+							// 			$chip.attr("data-status","active")
+							// 				 .attr("data-row",null)
+							// 				 .attr("data-col",null);
+							// 			$('#rack').append($(this).css({ position: "relative" }).detach());
+							// 			client.usedChip = client.usedChip.filter(function(v) { return v.attr('id') == $chip.attr('id') ? false: true;}); //remove from usedChip if we remove the chip from the board
+							// 		}
+							// });
 
-								$("#board").on('dblclick','.chip', function() {
-									var $chip = $(this);
-									if($chip.attr("data-status")!="disabled") {
-											$chip.attr("data-status","active")
-												 .attr("data-row",null)
-												 .attr("data-col",null);
-											$('#rack').append($(this).css({ position: "relative" }).detach());
-											client.usedChip = client.usedChip.filter(function(v) { return v.attr('id') == $chip.attr('id') ? false: true;}); //remove from usedChip if we remove the chip from the board
-										}
-								});
+							$("#board").on('dblclick','.chip', function() {
+								var $chip = $(this);
+								if($chip.attr("data-status")!="disabled") {
+										$chip.attr("data-status","active")
+											 .attr("data-row",null)
+											 .attr("data-col",null);
+										$('#rack').append($(this).css({ position: "relative" }).detach());
+										client.usedChip = client.usedChip.filter(function(v) { return v.attr('id') == $chip.attr('id') ? false: true;}); //remove from usedChip if we remove the chip from the board
+									}
+							});
 
-								if ($(this).children().length == 0) {
-										ui.draggable.css({
-												position: "absolute",
-												left: 0 + "px",
-												top: 0 + "px",
-												zIndex: 1
-										});
-										ui.draggable.detach();
-										$(this).append(ui.draggable);
-								}
-								else {
-										console.log(ui.draggable.data());
-										ui.draggable.draggable('option', 'revert', true);
-								}
-						},
-						out: function(event, ui) {
-								//$(this).droppable('enable');
-						},
-						over: function(event, ui) {
-								//$(this).droppable('enable');
-								$(this).css({
-										//opacity: 0.9
-								});
+							if ($(this).children().length == 0) {
+									ui.draggable.css({
+											position: "absolute",
+											left: 0 + "px",
+											top: 0 + "px",
+											zIndex: 1
+									});
+									ui.draggable.detach();
+									$(this).append(ui.draggable);
+							}
+							else {
+									console.log(ui.draggable.data());
+									ui.draggable.draggable('option', 'revert', true);
+							}
+					},
+					out: function(event, ui) {
+							//$(this).droppable('enable');
+					},
+					over: function(event, ui) {
+							//$(this).droppable('enable');
+							$(this).css({
+									//opacity: 0.9
+							});
 
-						}
-				});
-		};
+					}
+			});
+	};
 
 
 }
@@ -263,9 +263,7 @@ function Region(name, startPt, endPt, Rule){
 3 = double equation score
 4 = triple equation scores
 5 = star
-*/
 
-/*
 board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
 */
 function Board (divName,r,c,ch,cw,w,h) {
@@ -302,27 +300,28 @@ function Board (divName,r,c,ch,cw,w,h) {
 
 			this.bottom_left_corner =  {
 				"x": 0,
-				"y": r*(CSSs.cell_w + CSSs.spacing)
+				"y": Game.viewport.height//r*(CSSs.cell_w + CSSs.spacing)
 			};
 
-			this.vertical_marker =  {
-				"x": (this.bottom_left_corner.x - this.top_left_corner.x)/2,
-				"y": 0
-			};
 
 			this.top_right_corner =  {
-				"x": c*(CSSs.cell_w + CSSs.spacing),
+				"x": Game.viewport.width,//c*(CSSs.cell_w + CSSs.spacing),
 				"y": 0
 			};
 
 			this.bottom_right_corner =  {
-				"x": c*(CSSs.cell_w + CSSs.spacing),
-				"y": r*(CSSs.cell_w + CSSs.spacing)
+				"x": Game.viewport.width,//c*(CSSs.cell_w + CSSs.spacing),
+				"y": Game.viewport.height//r*(CSSs.cell_w + CSSs.spacing)
 			};
 
 			this.horizontal_marker =  {
 				"x": 0,
 				"y": (this.bottom_left_corner.y - this.top_left_corner.y)/2
+			};
+
+			this.vertical_marker =  {
+				"x": (this.top_right_corner.x - this.top_left_corner.x)/2,
+				"y": 0
 			};
 
 }
@@ -386,21 +385,62 @@ Board.prototype = {
 		   }
 		}
 	},
-	update:function(event, ui) {  //board drag function handler
+	update:function(event, ui) {  //board drag function handler - wrapped in a anonymous function :D
 
-//this here reference the jquery draggable object - the board div and not the the board object as defined above. So to access the markers i need to use a global variable - could be improved like by putting the all the board markers, into data-attribute and getting them from ui
+		//this here reference the jquery draggable object - the board div and not the the board object as defined above. So to access the markers i need to use a global variable - could be improved like by putting the all the board markers, into data-attribute and getting them from ui
 
-		console.log("horizontal_marker: "+ myBoard.horizontal_marker.y );
 		console.log(ui.position);
 
+		var t_left = {
+			"x": ui.position.left,
+			"y": ui.position.top
+			},
 
-		// if(ui.position.top < this.horizontal_marker.y ){
-		// 	console.log("generate more map above");
-		// }
-		// if(ui.position.top > this.horizontal_marker.y ){
-		// 	console.log("generate more map bellow");
-		// }
-		
+			b_left = {
+				"x": ui.position.left,
+				"y": ui.position.top + Game.viewport.height
+			},
+
+			t_right = {
+				"x": ui.position.left + Game.viewport.width,
+				"y": ui.position.top
+			},
+
+			b_right = {
+				"x": ui.position.left + Game.viewport.width,
+				"y": ui.position.top + Game.viewport.height
+			};
+
+		console.log(t_left);
+		console.log(b_left);
+		console.log(t_right);
+		console.log(b_right);
+		//console.log("horizontal " + this.horizontal_marker.y+" vertical "+this.vertical_marker.x +" bottom_left "+b_left.y  );
+		//console.log("horizontal_marker: "+ this.horizontal_marker.y );
+
+			// default bottom > marker - so check the opposite
+		if(b_left.y < this.horizontal_marker.y ){
+			console.log("bottom_left> marker");
+		}
+			// default top < marker
+		if(t_left.y > this.horizontal_marker.y ){
+			console.log("top_left> marker");
+		}
+			//default right > marker
+		if(t_right.x < this.vertical_marker.x ){
+			console.log("top_right > marker");
+		}
+			//default left < marker
+		if(t_left.x > this.vertical_marker.x ){
+			console.log("top_left > marker ");
+		}
+
+		// else
+		// 		if(ui.position.top > this.horizontal_marker.y ){
+		// 			console.log(ui.position.top + " generate more map above"+ this.horizontal_marker.y );
+		// 		}
+
+
 
 
 	}
@@ -438,7 +478,7 @@ function ChipHolder(_DOM_element) {
 			return eqSign.length;
 	}
 
-/* prepare the new chips*/
+	/* prepare the new chips*/
 	this.makeNewSet = function(_num,_op,_Eq) {
 		for (var i = number.length|| _num; i > 0; i--) {
 			//NewNumChip( new Chip("num", Game.getRandomInt(-9,9)));  //-- give negative numbers
@@ -454,9 +494,8 @@ function ChipHolder(_DOM_element) {
 		}
 	};
 
-/* push the new chips onto the rack*/
+	/* push the new chips onto the rack*/
 	this.getChips = function( ) {
-
 		for (var i = number.length - 1; i >= 0; i--) {
 			$(this.DOM_element).append(number[i].GetSelf()[0]);
 		}
@@ -470,16 +509,13 @@ function ChipHolder(_DOM_element) {
 		}
 	};
 
-	//for all new symbols to be added. this function will return a new chip with the appropriate symbol
+	// for all new symbols to be added. this function will return a new chip with the appropriate symbol
 	this.getSymbols = function(symbol) {
-	if (symbol == "left-parenthesis"){
-		// for (var k = _Eq; k > 0; k--) {
-		// 	NewEqChip(new Chip("Eq", "="));
-		// }
-		return ((new Chip("left-parenthesis","(")).GetSelf()[0]);
-	}
-	if (symbol == "right-parenthesis" )
-		return ((new Chip("right-parenthesis",")")).GetSelf()[0]);
+		if (symbol == "left-parenthesis"){
+			return ((new Chip("left-parenthesis","(")).GetSelf()[0]);
+		}
+		if (symbol == "right-parenthesis" )
+			return ((new Chip("right-parenthesis",")")).GetSelf()[0]);
 	}
 
 	this.reset = function () {
@@ -682,11 +718,10 @@ var Client = function (name,homeTile) {
 			this.equationChip[i].attr("data-status","disabled");
 			this.equationChip[i].unbind('dblclick'); // remove dblclick event
 		};
-	}
+	};
 	this.parseEquation = function (_myEquation) {
-		// return module.exports.parse(_myEquation);  //Peg.js generated grammar parser
 		return EquationParser.parse(_myEquation);  //Peg.js generated grammar parser
-	 }
+	};
 };
 /*================================================================================================*/
 
@@ -697,7 +732,9 @@ var Client = function (name,homeTile) {
 	myBoard.buildGrid("#board",CSSs);
 	Game.setWorldDim();
 	$('#board').draggable({ //will be move into Board class soon
-		drag: myBoard.update
+		drag: function (event, ui) {
+					myBoard.update(event , ui);
+				}
 	});
 	(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
 
