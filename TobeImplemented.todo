@@ -7,9 +7,11 @@ Millestone:
  ☐ Map rendering
    ✔ basic map @done (13-03-20 19:28)
    ☐ infinite map
+      ✔ pseudoInfinite @done (13-03-25 07:47)
+      ☐ optimized intinite
    ✔ tile coloring @done (13-03-21 08:40)
      ☐ make it prettier
-   ☐ Special tiles with weight
+   ✔ Special tiles with weight @done (13-03-25 07:46)
 
  ☐ Network data formating
    ☐ use json format

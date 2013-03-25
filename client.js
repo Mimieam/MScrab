@@ -25,6 +25,7 @@ Game = {};
 	Game.selectedChip;
 	Game.tileCnt = 0;
 	Game.chipCnt = 0;
+	Game.stop_update = 0;
 
 /*display*/
 Game.show_props = function (obj, objName) {
@@ -75,7 +76,9 @@ Game.getBrowserDimension = function  (argument) {
 	}
 	var  dim = {
 		"width":winW,
-		"height":winH
+		"height":winH,
+		"x":document.body.left,
+		"y":document.body.top
 	};
 
 	return dim;
@@ -108,7 +111,7 @@ function Chip(type,value) {
 												"droppedIn": ""
 								})
 								.draggable({
-										containment: '#board,#rack',
+										// containment: '#board,#rack',
 										cursor: 'move',
 								revert: "invalid"
 							});
@@ -178,17 +181,17 @@ function Tile(T, L, status, type) {
 							ui.draggable.attr('data-droppedIn', this.id);
 							ui.draggable.attr('data-row', $(this).attr('row'));
 							ui.draggable.attr('data-col', $(this).attr('col'));
-							console.log(ui.draggable.attr("id") + " with value: " + ui.draggable.data("content") + " is in " + ui.draggable.attr('data-droppedIn'));
-							console.log(ui.draggable.attr("data-row") + " - " + ui.draggable.attr('data-col'));
-							console.log($(this).attr('col'));
-							console.log($(this).attr('row'));
-							console.log(client.name);
+							// console.log(ui.draggable.attr("id") + " with value: " + ui.draggable.data("content") + " is in " + ui.draggable.attr('data-droppedIn'));
+							// console.log(ui.draggable.attr("data-row") + " - " + ui.draggable.attr('data-col'));
+							// console.log($(this).attr('col'));
+							// console.log($(this).attr('row'));
+							// console.log(client.name);
 
 							if ($.inArray(ui.draggable, client.usedChip) == -1){
 								client.usedChip.push(ui.draggable);
 							}
-							console.log(client.usedChip.length);
-							console.log(client.usedTile.length);
+							// console.log(client.usedChip.length);
+							// console.log(client.usedTile.length);
 							// if(!$(this).hasClass("transform-h-x"))  // just messing around with 2.5D
 							//$(".tile").addClass('transform-h-x');
 
@@ -273,6 +276,7 @@ function Board (divName,r,c,ch,cw,w,h) {
 			CSSs.cell_h = ch || CSSs.cell_h;
 			CSSs.cell_w = cw || CSSs.cell_w;
 			this.cnt = 0;
+			this.DOM_element = divName;
 			this.tileSet = [];
 			this.patternStr = "";
 			this.cols = c || Math.floor(this.height / CSSs.cell_h);
@@ -316,24 +320,24 @@ function Board (divName,r,c,ch,cw,w,h) {
 
 			this.horizontal_marker =  {
 				"x": 0,
-				"y": (this.bottom_left_corner.y - this.top_left_corner.y)/2
+				"y": (this.bottom_left_corner.y - this.top_left_corner.y)/4
 			};
 
 			this.vertical_marker =  {
-				"x": (this.top_right_corner.x - this.top_left_corner.x)/2,
+				"x": (this.top_right_corner.x - this.top_left_corner.x)/4,
 				"y": 0
 			};
 
 }
 
 Board.prototype = {
-	buildGrid:function(divName,CSSs) {
+	buildGrid:function(divName,CSSs,startCol,startRow ) {
 		var t ;
 		var grid = [];
 		// console.log(console.memory.usedJSHeapSize);
 		// console.time("Testing Grid build");
-		for (var i = 0; i < this.rows; i ++) {
-				for (var j = 0; j < this.cols; j ++) {
+		for (var i = startRow; i < this.rows; i ++) {
+				for (var j = startCol; j < this.cols; j ++) { //TODO : change the 2 following lines to not use the global css
 					CSSs.Tile['top'] =  i * (CSSs.cell_w + CSSs.spacing);
 					CSSs.Tile['left']  = j * (CSSs.cell_w + CSSs.spacing);
 					t = (new Tile(i,j)).GetSelf() ;
@@ -348,10 +352,39 @@ Board.prototype = {
 			//background of the board
 		var board_width  =  this.cols * (CSSs.cell_w + CSSs.spacing) - CSSs.spacing +2;  // - CSSs.spacing +2px of border fix margin of board constrasting with tile
 		var board_height =  this.rows * (CSSs.cell_h + CSSs.spacing) - CSSs.spacing +2;
-		$(divName).css({"width":board_width,"height":board_height});
+		// $(divName).css({"width":board_width,"height":board_height});
 		$(divName)[0].innerHTML = grid.join ('');
 	},
+
+	updateGrid:function(divName,CSSs,startingRow,endingRow, startingCol, endingCol ) {
+		var t ;
+		var grid = [];
+		var rows = Math.abs(startingRow - endingRow);
+		var cols = Math.abs(startingCol - endingCol);
+		for (var i = startingRow; i < endingRow; i ++) {
+				for (var j = startingCol; j < endingCol; j ++) { //TODO : change the 2 following lines to not use the global css
+					CSSs.Tile['top'] =  i * (CSSs.cell_w + CSSs.spacing);
+					CSSs.Tile['left']  = j * (CSSs.cell_w + CSSs.spacing);
+					t = (new Tile(i,j)).GetSelf() ;
+					this.applyPattern(t,i,j);
+					grid.push(t[0].outerHTML);
+					this.cnt++;
+				}
+			}
+			//background of the board
+
+		var board_width = $(divName).width() + cols * (CSSs.cell_w + CSSs.spacing) - CSSs.spacing +2;  // - CSSs.spacing +2px of border fix margin of board constrasting with tile
+		var board_height = $(divName).height() + rows * (CSSs.cell_h + CSSs.spacing) - CSSs.spacing +2;
+		// $(divName).css({"width":board_width,"height":board_height});
+		// $(divName).append(grid.join (''));
+		$(grid.join("")).prependTo(divName);
+		// $(divName).append(grid.join (''));
+		//(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
+	},
 	applyPattern:function (tile,x,y) {
+		var x = Math.abs(x);
+		var y = Math.abs(y);
+		// console.log(y%14);
 		//var r = x%14;  // 15 -1 = # of columns of pattern -1 to wrap onto the next
 		//var c = y%14; //  well here its the number of row
 		for (var row in this.pattern){
@@ -391,58 +424,81 @@ Board.prototype = {
 
 		console.log(ui.position);
 
-		var t_left = {
+		var top_left = {
 			"x": ui.position.left,
 			"y": ui.position.top
 			},
 
-			b_left = {
+			bottom_left = {
 				"x": ui.position.left,
 				"y": ui.position.top + Game.viewport.height
 			},
 
-			t_right = {
+			top_right = {
 				"x": ui.position.left + Game.viewport.width,
 				"y": ui.position.top
 			},
 
-			b_right = {
+			bottom_right = {
 				"x": ui.position.left + Game.viewport.width,
 				"y": ui.position.top + Game.viewport.height
 			};
 
-		console.log(t_left);
-		console.log(b_left);
-		console.log(t_right);
-		console.log(b_right);
-		//console.log("horizontal " + this.horizontal_marker.y+" vertical "+this.vertical_marker.x +" bottom_left "+b_left.y  );
+		// console.log(top_left);
+		// console.log(bottom_left);
+		// console.log(top_right);
+		// console.log(bottom_right);
+		// console.log("horizontal " + this.horizontal_marker.y+" vertical "+this.vertical_marker.x +" bottom_left "+bottom_left.y  );
 		//console.log("horizontal_marker: "+ this.horizontal_marker.y );
 
 			// default bottom > marker - so check the opposite
-		if(b_left.y < this.horizontal_marker.y ){
+		if(bottom_left.y < this.horizontal_marker.y ){
 			console.log("bottom_left> marker");
 		}
 			// default top < marker
-		if(t_left.y > this.horizontal_marker.y ){
+		if(top_left.y > this.horizontal_marker.y ){
 			console.log("top_left> marker");
 		}
 			//default right > marker
-		if(t_right.x < this.vertical_marker.x ){
+		if(top_right.x < this.vertical_marker.x ){
 			console.log("top_right > marker");
 		}
 			//default left < marker
-		if(t_left.x > this.vertical_marker.x ){
-			console.log("top_left > marker ");
+		if(top_left.x > this.vertical_marker.x ){
+			top_left = {
+			"x": ui.position.left,
+			"y": ui.position.top
+			};
+
+			bottom_left = {
+				"x": ui.position.left,
+				"y": ui.position.top + Game.viewport.height
+			};
+
+			top_right = {
+				"x": ui.position.left + Game.viewport.width,
+				"y": ui.position.top
+			};
+
+			bottom_right = {
+				"x": ui.position.left + Game.viewport.width,
+				"y": ui.position.top + Game.viewport.height
+			};
+
+			// console.log(top_left.x%Game.viewport.width==Math.ceil(Game.viewport.width/3));
+			// console.log(top_left.x%Game.viewport.width+ " = " +Math.ceil(Game.viewport.width/3));
+			var checkpoint = (top_left.x%Game.viewport.width),
+			startingCol = -Math.floor(ui.position.left/(CSSs.cell_h + CSSs.spacing)),
+			endingCol = -Math.floor((ui.position.left - this.vertical_marker.x)/(CSSs.cell_h + CSSs.spacing)); 
+			// if (Game.stop_update == 0){
+				console.log("star : "+startingCol+ "ENd "+ endingCol);
+			if (  Math.ceil(Game.viewport.width/3) - 1 <=checkpoint < Math.ceil(Game.viewport.width/3)) 	{
+				// updateGrid:function(divName,CSSs,startingRow,endingRow, startingCol, endingCol )
+				this.updateGrid("#board",CSSs,0,5,startingCol,endingCol);
+				Game.stop_update++;
+			}
+			//console.log("top_left > marker ");
 		}
-
-		// else
-		// 		if(ui.position.top > this.horizontal_marker.y ){
-		// 			console.log(ui.position.top + " generate more map above"+ this.horizontal_marker.y );
-		// 		}
-
-
-
-
 	}
 };
 /*================================================================================================*/
@@ -453,7 +509,7 @@ function ChipHolder(_DOM_element) {
 	var eqSign = [];
 	var Symbols;
 	this.DOM_element = _DOM_element;
-	$(this.DOM_element).css("background-color","red").droppable({accept: 'div.chip' ,   hoverClass: 'hovered',    // need to be somewhere else...
+	$(this.DOM_element).addClass("bluePrint").css({"background-color":"#282828" }).droppable({accept: 'div.chip' ,   hoverClass: 'hovered',    // need to be somewhere else...
             drop: function (event, ui) {
 							ui.draggable.css({});
 							// $(this).css({opacity: 0.8});
@@ -728,15 +784,15 @@ var Client = function (name,homeTile) {
 // board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
 //test("ChipHolder Test", function () {
 	Mimi = new Client("Mimi");
-	var myBoard = new Board("#board",15,35);
-	myBoard.buildGrid("#board",CSSs);
+	var myBoard = new Board("#board",5,5);
+	myBoard.buildGrid("#board",CSSs,0,0);
 	Game.setWorldDim();
 	$('#board').draggable({ //will be move into Board class soon
 		drag: function (event, ui) {
 					myBoard.update(event , ui);
 				}
 	});
-	(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
+	//(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
 
 		// equal(Mimi.getLength(), 1 , "should be 6");
 //});
