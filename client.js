@@ -87,6 +87,7 @@ Game.getBrowserDimension = function  (argument) {
 Game.viewport = Game.getBrowserDimension();
 Game.setWorldDim = function () {
 	$('.world').css({"width":Game.viewport.width,"height":Game.viewport.height});
+	// $('#board').css({"width":Game.viewport.width,"height":Game.viewport.height});
 }
 /*================================================================================================*/
 function Chip(type,value) {
@@ -271,16 +272,30 @@ board (div, row, column,  cell height, cell width ,  width -pixel , height -pixe
 */
 function Board (divName,r,c,ch,cw,w,h) {
 		'use strict';
-			this.width = w || $(divName).width();
-			this.height = h || $(divName).height();
+			$(divName).css({"width":Game.viewport.width,"height":Game.viewport.height});
+			this.width =$(divName).width();
+			this.height =$(divName).height();
 			CSSs.cell_h = ch || CSSs.cell_h;
 			CSSs.cell_w = cw || CSSs.cell_w;
 			this.cnt = 0;
 			this.DOM_element = divName;
 			this.tileSet = [];
 			this.patternStr = "";
-			this.cols = c || Math.floor(this.height / CSSs.cell_h);
-			this.rows = r || Math.floor(this.width / CSSs.cell_w);
+			this.cols =  Math.ceil(this.width / CSSs.cell_w); 
+			this.rows = Math.ceil(this.height / CSSs.cell_h);
+
+			console.log(this.width);
+
+			// this.width = w || $(divName).width();
+			// this.height = h || $(divName).height();
+			// CSSs.cell_h = ch || CSSs.cell_h;
+			// CSSs.cell_w = cw || CSSs.cell_w;
+			// this.cnt = 0;
+			// this.DOM_element = divName;
+			// this.tileSet = [];
+			// this.patternStr = "";
+			// this.cols = c || Math.floor(this.height / CSSs.cell_h);
+			// this.rows = r || Math.floor(this.width / CSSs.cell_w);
 			this.pattern =[[4,0,0,1,0,0,0,4,0,0,0,1,0,0,4],
 				           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
 				           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
@@ -352,7 +367,7 @@ Board.prototype = {
 			//background of the board
 		var board_width  =  this.cols * (CSSs.cell_w + CSSs.spacing) - CSSs.spacing +2;  // - CSSs.spacing +2px of border fix margin of board constrasting with tile
 		var board_height =  this.rows * (CSSs.cell_h + CSSs.spacing) - CSSs.spacing +2;
-		// $(divName).css({"width":board_width,"height":board_height});
+		 $(divName).css({"width":board_width,"height":board_height});
 		$(divName)[0].innerHTML = grid.join ('');
 	},
 
@@ -488,12 +503,15 @@ Board.prototype = {
 			// console.log(top_left.x%Game.viewport.width==Math.ceil(Game.viewport.width/3));
 			// console.log(top_left.x%Game.viewport.width+ " = " +Math.ceil(Game.viewport.width/3));
 			var checkpoint = (top_left.x%Game.viewport.width),
+			lastCol = 0,
 			startingCol = -Math.floor(ui.position.left/(CSSs.cell_h + CSSs.spacing)),
 			endingCol = -Math.floor((ui.position.left - this.vertical_marker.x)/(CSSs.cell_h + CSSs.spacing)); 
 			// if (Game.stop_update == 0){
-				console.log("star : "+startingCol+ "ENd "+ endingCol);
-			if (  Math.ceil(Game.viewport.width/3) - 1 <=checkpoint < Math.ceil(Game.viewport.width/3)) 	{
+			if (( Math.floor(Game.viewport.width/3)< checkpoint < Math.floor(Game.viewport.width/3))&& ( lastCol!= startingCol)){
+			// if ( (Math.ceil(Game.viewport.width/3)-1 < checkpoint) || (checkpoint < Math.ceil(Game.viewport.width/3))) 	{
 				// updateGrid:function(divName,CSSs,startingRow,endingRow, startingCol, endingCol )
+				console.log("star : "+startingCol+ "ENd "+ endingCol);
+				lastCol = startingCol;
 				this.updateGrid("#board",CSSs,0,5,startingCol,endingCol);
 				Game.stop_update++;
 			}
@@ -784,15 +802,15 @@ var Client = function (name,homeTile) {
 // board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
 //test("ChipHolder Test", function () {
 	Mimi = new Client("Mimi");
-	var myBoard = new Board("#board",5,5);
+	var myBoard = new Board("#board",0,0);
 	myBoard.buildGrid("#board",CSSs,0,0);
 	Game.setWorldDim();
-	$('#board').draggable({ //will be move into Board class soon
-		drag: function (event, ui) {
-					myBoard.update(event , ui);
-				}
-	});
-	//(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
+	// $('#board').draggable({ //will be move into Board class soon
+	// 	// drag: function (event, ui) {
+	// 	// 			//myBoard.update(event , ui);
+	// 	// 		}
+	// });
+	(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
 
 		// equal(Mimi.getLength(), 1 , "should be 6");
 //});
