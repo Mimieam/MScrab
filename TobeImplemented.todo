@@ -25,7 +25,10 @@ Millestone:
    ☐
 Bug:
  ☐ Validation equation need more testing
- ☐
- ☐
+ ☐ chip is offset sometime on drop
+ ☐ 
+
+Tuneup:
+ ☐ remove all css from js and use OOCSS
 Tools:
  ☐ Texture Packer = > create a atlas(or sprite sheet) from lots of images

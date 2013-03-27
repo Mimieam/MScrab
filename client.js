@@ -5,15 +5,95 @@ $(window).load(function(){
 
 $(document).ready(function() {
 
+// (function ($) {
+//    $.fn.liveDraggable = function (opts) {
+//       this.live("mouseover.liveDraggable", function() {
+//          $(this).draggable(opts);
+//          // $(this).off('mouseover.liveDraggable'); // kill the mouseover - requires JQ 1.7+
+//          $(this).unbind('mouseover.liveDraggable'); // kill the mouseover
+//       });
+//       return $();
+//    };
+// }(jQuery));
+// (function ($) {
+//    $.fn.liveDroppable = function (opts) {
+//       $(document).on("mouseover.liveDroppable",".tile", function() {
+//          $(this).droppable(opts);
+//          // $(this).off('mouseover.liveDroppable'); // kill the mouseover - requires JQ 1.7+
+//          $(this).unbind('mouseover.liveDroppable'); // kill the mouseover
+//       });
+//       return $();
+//    };
+// }(jQuery));
+
+(function( $ ) {
+
+    $.support.touch = typeof Touch === 'object';
+
+    if (!$.support.touch) {
+        return;
+    }
+
+    var proto =  $.ui.mouse.prototype,
+    _mouseInit = proto._mouseInit;
+
+    $.extend( proto, {
+        _mouseInit: function() {
+            this.element
+            .bind( "touchstart." + this.widgetName, $.proxy( this, "_touchStart" ) );
+            _mouseInit.apply( this, arguments );
+        },
+
+        _touchStart: function( event ) {
+            if ( event.originalEvent.targetTouches.length != 1 ) {
+                return false;
+            }
+
+            this.element
+            .bind( "touchmove." + this.widgetName, $.proxy( this, "_touchMove" ) )
+            .bind( "touchend." + this.widgetName, $.proxy( this, "_touchEnd" ) );
+
+            this._modifyEvent( event );
+
+            $( document ).trigger($.Event("mouseup")); //reset mouseHandled flag in ui.mouse
+            this._mouseDown( event );
+
+            return false;           
+        },
+
+        _touchMove: function( event ) {
+            this._modifyEvent( event );
+            this._mouseMove( event );   
+        },
+
+        _touchEnd: function( event ) {
+            this.element
+            .unbind( "touchmove." + this.widgetName )
+            .unbind( "touchend." + this.widgetName );
+            this._mouseUp( event ); 
+        },
+
+        _modifyEvent: function( event ) {
+            event.which = 1;
+            var target = event.originalEvent.targetTouches[0];
+            event.pageX = target.clientX;
+            event.pageY = target.clientY;
+        }
+
+    });
+
+})( jQuery );
+
 var CSSs = new (function  () {
 	this.spacing = 5;
-	this.cell_w = 70;
-	this.cell_h = 70;
+	this.cell_w = 200;
+	this.cell_h = 200;
 	this.ChipColor = '#F2F2F2';
 	this.TilesColor ='';
 	this.left = 0;
 	this.top =0;
-	this.Chip = { zIndex:"0", position: "relative", "float":"left",top: 10 + this.spacing,left: 10 + this.spacing, width: this.cell_w,height: this.cell_h,background: this.ChipColor };
+	this.Chip = { zIndex:"0", position: "relative", "float":"left",top: 10 + this.spacing,left: 10 + this.spacing, width: 70,height: 70,background: this.ChipColor };
+	// this.Chip = { zIndex:"0", position: "relative", "float":"left",top: 10 + this.spacing,left: 10 + this.spacing, width: this.cell_w,height: this.cell_h,background: this.ChipColor };
 	this.Tile = {zIndex:"0", position: "absolute", width: this.cell_w,height: this.cell_h,background: this.TilesColor, top: this.top ,left: this.left };
 }) ();
 
@@ -26,6 +106,9 @@ Game = {};
 	Game.tileCnt = 0;
 	Game.chipCnt = 0;
 	Game.stop_update = 0;
+var world,
+	rack,
+	board;
 
 /*display*/
 Game.show_props = function (obj, objName) {
@@ -101,7 +184,6 @@ function Chip(type,value) {
 	var self = $('<div />').addClass("chip")
 							.css(CSSs.Chip)
 								.attr('id', 'chip_' + Game.chipCnt)
-								.addClass("ui-draggable")
 								.text(this.content)
 								.data({
 
@@ -115,6 +197,41 @@ function Chip(type,value) {
 										// containment: '#board,#rack',
 										cursor: 'move',
 								revert: "invalid"
+								 // revert: function(obj) {
+						   //          if (obj === false) {
+						   //              // Drop was rejected, revert the helper.
+						   //              console.log(this);
+						   //              $(this).css({"width":"200px", "height":"200px",background:"red"});
+						   //              var $helper = $("#mydrag").css({color:"red"});
+						   //              $helper.fadeOut("slow").animate($helper.originalPosition);
+						   //              return true;
+						   //          } else {
+						   //              // Drop was accepted, don't revert.
+						   //              console.log(this);
+						   //              return false;
+						   //          }
+						   //      }
+								// revert: function(ui)
+								//   {
+								//      //if false then no socket object drop occurred.
+								//      if(ui === false)
+								//      {
+								//      	console.log('revert me');
+								//      	ui.draggable.css({width:"200px",height:"200px"});
+								//         //revert the peg by returning true
+								//         return true;
+								//      }
+								//      else
+								//      {
+								//         //socket object was returned,
+								//         //we can perform additional checks here if we like
+								//         //alert(socketObj.attr('id')); would work fine
+								// 		console.log('revert me');
+								//      	//ui.draggable.css({width:"200px",height:"200px"});
+								//         //return false so that the peg does not revert
+								//         return false;
+								//      }
+								//   }
 							});
 
 							//private
@@ -150,7 +267,7 @@ function Tile(T, L, status, type) {
 	this.col = L; // tile coordinate on the board ( top, left)
 	this.row = T;
 	this.status = status || "free";
-	var self = $('<div />').addClass("tile").css(CSSs.Tile).addClass("ui-droppable").attr({
+	var self = $('<div />').addClass("tile").css(CSSs.Tile).attr({
 			"id": this.id,
 			"type": this.type,
 			"status": this.status,
@@ -174,14 +291,19 @@ function Tile(T, L, status, type) {
 	};
 
 	this.makeAllTileDroppable = function(divs, client) {
-			$(divs).droppable({
+			$("#board").find(divs).droppable({
 					accept: 'div.chip',
 					hoverClass: 'hovered',
 					drop: function(event, ui) {
-
-							ui.draggable.attr('data-droppedIn', this.id);
-							ui.draggable.attr('data-row', $(this).attr('row'));
-							ui.draggable.attr('data-col', $(this).attr('col'));
+							ui.draggable.css({"width":"200px", "height":"200px"})
+										.attr({	'data-droppedIn': this.id,
+												'data-row': $(this).attr('row'),
+												'data-col': $(this).attr('col')
+											});
+							// ui.draggable.attr();
+							// ui.draggable.attr();
+							// console.log(ui.draggable.attr('data-row'));
+							// ui.draggable.css({"width":"200px", "height":"200px"});
 							// console.log(ui.draggable.attr("id") + " with value: " + ui.draggable.data("content") + " is in " + ui.draggable.attr('data-droppedIn'));
 							// console.log(ui.draggable.attr("data-row") + " - " + ui.draggable.attr('data-col'));
 							// console.log($(this).attr('col'));
@@ -214,7 +336,7 @@ function Tile(T, L, status, type) {
 										$chip.attr("data-status","active")
 											 .attr("data-row",null)
 											 .attr("data-col",null);
-										$('#rack').append($(this).css({ position: "relative" }).detach());
+										$('#rack').append($(this).css({ position: "relative", "width":"70px", "height":"70px"}).detach()); 
 										client.usedChip = client.usedChip.filter(function(v) { return v.attr('id') == $chip.attr('id') ? false: true;}); //remove from usedChip if we remove the chip from the board
 									}
 							});
@@ -224,14 +346,22 @@ function Tile(T, L, status, type) {
 											position: "absolute",
 											left: 0 + "px",
 											top: 0 + "px",
-											zIndex: 1
+											zIndex: 1,
+											width:"200px",
+											height:"200px"
 									});
 									ui.draggable.detach();
 									$(this).append(ui.draggable);
 							}
 							else {
-									console.log(ui.draggable.data());
-									ui.draggable.draggable('option', 'revert', true);
+									console.log(ui.draggable.data()); // check minor bug with data row and col bein null if we drag to a busy tile
+									// console.log(ui.draggable.parent());
+									ui.draggable.css({"width":"200px", "height":"200px"});
+
+									if($(this).children().length == 1 && ui.draggable.parent()[0].id =='rack' ){ // revert if going to rack
+										ui.draggable.css({ position: "relative", "width":"70px", "height":"70px"});
+									}
+									ui.draggable.draggable('option', 'revert', true );
 							}
 					},
 					out: function(event, ui) {
@@ -273,29 +403,29 @@ board (div, row, column,  cell height, cell width ,  width -pixel , height -pixe
 function Board (divName,r,c,ch,cw,w,h) {
 		'use strict';
 			$(divName).css({"width":Game.viewport.width,"height":Game.viewport.height});
-			this.width =$(divName).width();
-			this.height =$(divName).height();
-			CSSs.cell_h = ch || CSSs.cell_h;
-			CSSs.cell_w = cw || CSSs.cell_w;
-			this.cnt = 0;
-			this.DOM_element = divName;
-			this.tileSet = [];
-			this.patternStr = "";
-			this.cols =  Math.ceil(this.width / CSSs.cell_w); 
-			this.rows = Math.ceil(this.height / CSSs.cell_h);
-
-			console.log(this.width);
-
-			// this.width = w || $(divName).width();
-			// this.height = h || $(divName).height();
+			// this.width =$(divName).width();
+			// this.height =$(divName).height();
 			// CSSs.cell_h = ch || CSSs.cell_h;
 			// CSSs.cell_w = cw || CSSs.cell_w;
 			// this.cnt = 0;
 			// this.DOM_element = divName;
 			// this.tileSet = [];
 			// this.patternStr = "";
-			// this.cols = c || Math.floor(this.height / CSSs.cell_h);
-			// this.rows = r || Math.floor(this.width / CSSs.cell_w);
+			// this.cols =  Math.ceil(this.width / CSSs.cell_w); 
+			// this.rows = Math.ceil(this.height / CSSs.cell_h);
+
+			console.log(this.width);
+
+			this.width = w || $(divName).width();
+			this.height = h || $(divName).height();
+			CSSs.cell_h = ch || CSSs.cell_h;
+			CSSs.cell_w = cw || CSSs.cell_w;
+			this.cnt = 0;
+			this.DOM_element = divName;
+			this.tileSet = [];
+			this.patternStr = "";
+			this.cols = c || Math.floor(this.height / CSSs.cell_h);
+			this.rows = r || Math.floor(this.width / CSSs.cell_w);
 			this.pattern =[[4,0,0,1,0,0,0,4,0,0,0,1,0,0,4],
 				           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
 				           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
@@ -527,7 +657,8 @@ function ChipHolder(_DOM_element) {
 	var eqSign = [];
 	var Symbols;
 	this.DOM_element = _DOM_element;
-	$(this.DOM_element).addClass("bluePrint").css({"background-color":"#282828" }).droppable({accept: 'div.chip' ,   hoverClass: 'hovered',    // need to be somewhere else...
+	// $(this.DOM_element).addClass("bluePrint").css({"background-color":"#282828" }).droppable({accept: 'div.chip' ,   hoverClass: 'hovered',    // need to be somewhere else...
+	$(this.DOM_element).droppable({accept: 'div.chip' ,   hoverClass: 'hovered',    // need to be somewhere else...
             drop: function (event, ui) {
 							ui.draggable.css({});
 							// $(this).css({opacity: 0.8});
@@ -800,19 +931,18 @@ var Client = function (name,homeTile) {
 /*================================================================================================*/
 
 // board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
-//test("ChipHolder Test", function () {
 	Mimi = new Client("Mimi");
-	var myBoard = new Board("#board",0,0);
+	// var myBoard = new Board("#board",0,0);
+	var myBoard = new Board("#board",10,10);
 	myBoard.buildGrid("#board",CSSs,0,0);
 	Game.setWorldDim();
-	// $('#board').draggable({ //will be move into Board class soon
-	// 	// drag: function (event, ui) {
-	// 	// 			//myBoard.update(event , ui);
-	// 	// 		}
-	// });
+	$('#board').draggable({ //will be move into Board class soon
+		// drag: function (event, ui) {
+		// 			//myBoard.update(event , ui);
+		// 		}
+	});
 	(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
-
-		// equal(Mimi.getLength(), 1 , "should be 6");
-//});
+	// $('#board').liveDroppable({accept: 'div.chip',
+	// 				hoverClass: 'hovered' });
 
 });
