@@ -1,5 +1,8 @@
 watcher.ps1
 game.js
+server.js
+.gitignore
+.htaccess
 .git
 Outdated
 client
