@@ -27,7 +27,7 @@ World
     
 #####Tile types:
 * num
-* sign (operator & parenteses) 
+* sign (operator & <del>parenteses</del>) 
 * equal
 	-> keep 2 running totals , vertical/horizontal 
 
@@ -42,4 +42,6 @@ World
  soonn...
 
 ## So Far ^^
-![ScreenShot](https://raw.github.com/Mimieam/MScrab/master/First%20Millestone.png)
+![ScreenShot](https://raw.github.com/Mimieam/MScrab/master/img/First%20Millestone.png)
+as of  (01-04-13 04:22)
+![ScreenShot](https://raw.github.com/Mimieam/MScrab/master/img/2nd%20Stone.png)

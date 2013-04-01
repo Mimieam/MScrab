@@ -1,11 +1,12 @@
 Millestone:
  ☐ Equation validation
    ✔ simple implementation @done (13-03-20 19:28)
+   ✔ check all side of tiles @done (13-04-01 04:22)
    ☐ checking all side of each tile for possible side equations
    ☐ add tile weight before computing
 
  ☐ Map rendering
-   ✔ basic map @done (13-03-20 19:28)
+   ✔ basic map with pattern @done (13-03-20 19:28)
    ☐ infinite map    //currently stopped
       ✔ pseudoInfinite @done (13-03-25 07:47)
       ☐ optimized intinite
@@ -19,6 +20,7 @@ Millestone:
  ☐ Scoring
    ☐ computation
    ☐ animation
+   ✔ visual feedback on validation @done (13-04-01 04:23)
 
  ☐ Tunning
    ☐ better color for background and border (need designer help)
