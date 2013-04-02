@@ -58,6 +58,13 @@ $(document).ready(function() {
 
 })( jQuery );
 
+$('#info').hover(function() {
+    $('#stats').stop(true, true).slideDown("fast");
+}, function() {
+    $('#stats').stop(true, true).slideUp("fast");
+});
+
+
 var CSSs = new (function  () { /*will be moved to the .css*/
 	this.spacing = 5;
 	this.cell_w = 200;
@@ -776,7 +783,8 @@ var Client = function (name,homeTile) {
 	}
 
 	this.getScore = function() {  // priviledge function - will access my private function - don't work with prototype... sigh..
-		return "you've got "+ pGetScore() + " points" ;
+		console.log("you've got "+ pGetScore() + " points") ;
+		return pGetScore();
 	};
 
 	this.setScore = function(num) {
@@ -925,6 +933,8 @@ var Client = function (name,homeTile) {
 		console.log($(this.usedChip[this.usedChip.length -1 ]));
 
 		if (1){//  vadiation condition
+			this.setScore(result);
+			$('#info span').text(this.getScore());
 			var visualFB = new visualFeedback(false ,result, $(this.usedChip[this.usedChip.length -1 ]))
 			visualFB.GetSelf().animate({
 				'top': '-='+ (CSSs.cell_h +100)+'px',
@@ -937,7 +947,7 @@ var Client = function (name,homeTile) {
 			  });
 			this.rack.reset();
 			this.disable_on_validation();
-			this.rack.makeNewSet(5,2,1);
+			this.rack.makeNewSet(7,4,1);
 			this.rack.getChips();
 			// visualFB.reset();
 		}
@@ -959,9 +969,9 @@ var Client = function (name,homeTile) {
 /*================================================================================================*/
 
 // board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
-	Mimi = new Client("Mimi");
 	var myBoard = new Board("#board",15,15);
 	myBoard.buildGrid("#board",CSSs,0,0);
+	Mimi = new Client("Mimi");
 	Game.setWorldDim();
 	$('#board').draggable({ //will be move into Board class soon
 		// drag: function (event, ui) {
@@ -969,4 +979,7 @@ var Client = function (name,homeTile) {
 		// 		}
 	});
 	(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
+
+	document.onselectstart = function () { return false; } 
+
 });

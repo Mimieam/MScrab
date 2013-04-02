@@ -12,12 +12,29 @@
 </head>
 <!-- <body class = "bluePrint"> -->
 <body>
-<div class = "world " >
+<div class = "world" >
     <div id = "board"> 
     <span id="vfb" class="visualFeedback" style="display:none"></span>
     </div>
     <!-- <div id= "user_area">  -->
      <div id= "user_area"> 
+
+    <!--Simple game menu-->
+    <div id="info">
+      <div class="score">Score: <span> 0 </span></div>
+      <div class="menu shadow"> &#9776;</div>
+      <div id="stats">
+      <ul>
+        <li>Tile Used</li>
+        <li>Favorite Sign</li>
+        <li>Level</li>
+        <li>Scoreboard</li>
+      </ul>
+      </div>
+    </div>
+
+
+    
         <div id = "rack"> </div>
         <button id ="validateBtn" type=button onClick="Game.validateBoard()"> Validate </button> 
      </div>
