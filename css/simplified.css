@@ -141,6 +141,9 @@ body {
     line-height: 1.7em;
     margin-bottom: 0;
     position: relative;
+   /*background-image: url(https://plus.google.com/_/favicon?domain_url=http://www.facebook.com/);
+  background-repeat: no-repeat;
+  background-size: cover;*/
 }
 
 .is-BackOnRack
@@ -171,11 +174,14 @@ ul{
   padding:0;
 }
 #info{
-    z-index: 100;
+  z-index: 100;
   width:150px;
   border:1px solid gray;
   background:#444;
-  float:right;
+/*  float:right;*/
+  position:fixed;
+  top:5px;
+  right:5px;
 }
 .score{
   display:inline-block;

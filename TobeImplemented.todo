@@ -3,7 +3,7 @@ Millestone:
    ✔ simple implementation @done (13-03-20 19:28)
    ✔ check all side of tiles @done (13-04-01 04:22)
    ☐ checking all side of each tile for possible side equations
-   ☐ add tile weight before computing
+   ✔ add tile weight before computing @done (13-04-04 06:22)
 
  ☐ Map rendering
    ✔ basic map with pattern @done (13-03-20 19:28)
@@ -27,7 +27,7 @@ Millestone:
    ☐
 Bug:
  ☐ Validation equation need more testing
- ☐ chip is offset sometime on drop
+ ✔ chip is offset sometime on drop @done (13-04-04 06:01)
  ☐ 
 
 Tuneup:
