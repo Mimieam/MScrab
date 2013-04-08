@@ -76,12 +76,16 @@ body {
     }
 
 #validateBtn{
+    position:fixed;
+    z-index:100;
+    bottom: 2.4em;
+    left: 75%;
     /*width: 18%;*/
     /*height: 100%;*/
     /*margin-top: 0.5em;*/
     /*float: right;*/
     /*position: absolute;*/
-    /*background-color:lightgreen;*/
+    background-color:lightgreen;
      /*z-index:0;*/
      /*position: relative;*/
      width:200px;

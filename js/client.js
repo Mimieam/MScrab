@@ -399,7 +399,7 @@ function Board (divName,r,c,ch,cw,w,h) {
 			// this.cols =  Math.ceil(this.width / CSSs.cell_w); 
 			// this.rows = Math.ceil(this.height / CSSs.cell_h);
 
-			console.log(this.width);
+//			console.log(this.width);
 
 			this.width = w || $(divName).width();
 			this.height = h || $(divName).height();
@@ -556,7 +556,11 @@ Board.prototype = {
 	applyPatternForValidation : function  (chip) {
 		var x = chip.getAttribute('data-row'),
 			y = chip.getAttribute('data-col'),
-			chipValue = (parseInt(chip.firstChild.innerText));
+			chipValue = (parseInt(chip.firstChild.innerHTML));
+			if (isNaN(chipValue)){
+				console.log("a sign was on a special tile"+ chip.firstChild.innerHTML);
+				return chip.firstChild.innerHTML;
+			}
 		var r = x%14;  // 15 -1 = # of columns of pattern -1 to wrap onto the next
 		var c = y%14; //  well here its the number of row
 		console.log(x+" - "+y);
@@ -792,6 +796,29 @@ function ChipHolder(_DOM_element) {
 			return ((new Chip("right-parenthesis",")")).GetSelf()[0]);
 	}
 
+	this.sendInvalidBackToRack = function (Arr) {
+		var $chip;
+		for (var i = 0; i < Arr.length; i++) {
+				$chip = Arr[i];
+			if ($chip.attr("data-status") != "disabled") {
+					$chip.attr("data-status", "active")
+						.attr("data-row", null)
+						.attr("data-col", null);
+
+					$chip.removeAttr("style");
+					$chip.addClass("is-BackOnRack").removeClass("is-OnBoard").detach()
+					// console.log($chip.data('type'));
+					if ($chip.data('type') == "num") $('#rack ul li:nth-child(1)').append($chip);
+					if ($chip.data('type') == "op") $('#rack ul li:nth-child(2)').append($chip);
+					if ($chip.data('type') == ("eq"||"symbol")) $('#rack ul li:nth-child(3)').append($chip);
+
+					Arr = Arr.filter(function(v) {
+						return v.attr('id') == $chip.attr('id') ? false : true;
+					}); //remove from usedChip if we remove the chip from the board
+			};
+		}
+	}
+
 	this.reset = function () {
 		number = [];
 		opSign = [];
@@ -889,6 +916,7 @@ var Client = function (name,homeTile) {
 	// };
 
 	//this.lpcnt = 0;
+	/* this function will traverse the usedChip array by looking a chip neighbor */
 	this.traverseUsedChip = function (direction,orientation,chip) {
 		var neighbor = chip;
     	//this.lpcnt += 0.3;
@@ -900,8 +928,8 @@ var Client = function (name,homeTile) {
 				if (direction == "horizontal"){
 		          // console.log( col = this.degradingRadiant("7B3F00 ",this.lpcnt));
 		          // neighbor.css({"background-color":col});
-		          neighbor.css({"background-color":"chocolate"}); //evaluation color
-		          console.log("orientation " + orientation);
+		          neighbor.css({"background-color":"green"}); //evaluation color
+		         // console.log("orientation " + orientation);
           			if (orientation == "left"){
 
 						this.traverseUsedChip (direction, orientation,getChipNeighbor(orientation, chip));
@@ -939,15 +967,15 @@ var Client = function (name,homeTile) {
 	/* we are going from the last chip*/
 	this.validate = function() {
 
-		// console.log(this.printUsedTile());
+		//  
 		if (this.usedChip.length === 0)
 			return -1;
 		else {
-			var direction = "";
-			var LN = getChipNeighbor('left',(this.usedChip[this.usedChip.length -1 ]))	||null;//all available neighbor for the last chip
-			var RN = getChipNeighbor('right',(this.usedChip[this.usedChip.length -1 ]))	||null;
-			var TN = getChipNeighbor('top',(this.usedChip[this.usedChip.length -1 ]))	||null;
-			var BN = getChipNeighbor('bottom',(this.usedChip[this.usedChip.length -1 ]))||null;
+			var  direction = "",
+						LN = getChipNeighbor('left',(this.usedChip[this.usedChip.length -1 ]))	||null,//all available neighbor for the last chip
+						RN = getChipNeighbor('right',(this.usedChip[this.usedChip.length -1 ]))	||null,
+						TN = getChipNeighbor('top',(this.usedChip[this.usedChip.length -1 ]))	||null,
+						BN = getChipNeighbor('bottom',(this.usedChip[this.usedChip.length -1 ]))||null;
 
 			console.log("last used CHip :"+this.usedChip[this.usedChip.length -1 ].html());
 			if ((LN.length === 0 ? (RN.length === 0 ? false : true) : true )){
@@ -973,20 +1001,35 @@ var Client = function (name,homeTile) {
 			}
 
 		}
-
+// console.log(this.equation);
 		console.log(this.usedChip);
 		var weightedEquation = [];
 		for (var i = 0; i < this.usedChip.length; i++) {
 			 weightedEquation.push(myBoard.applyPatternForValidation(this.usedChip[i][0]));
-			 console.log(weightedEquation[i]);
 		};
+			 console.log(weightedEquation);
+		for (var i = 0; i < this.usedChip.length; i++) {
+			 console.log((this.usedChip[i][0]));
+		};
+
 		console.log("let's parse the equation: ");
 
 		var equation = this.equation.replace(/<\/?[^>]+(>|$)/g, ""); //remove span tags
 		console.log(equation);
 			equation = equation.replace(/\|/g,''); //remove | delimiter
 		console.log(equation);
-		var result = this.parseEquation(equation);
+		try{
+			var result = this.parseEquation(equation);
+			console.log(this.parseEquation("3=3=3"));
+			console.log(this.parseEquation("3+2*2=7+9-8-1=2*3+1"));
+			console.log(this.parseEquation("2=2=2+1"));
+
+		}catch(e){
+			alert(e);
+			this.rack.sendInvalidBackToRack (this.usedChip);
+			result ="Yo mama would be ashamed!!!"
+		}
+
 		console.log(result);
 		console.log($(this.usedChip[this.usedChip.length -1 ]));
 
@@ -1010,6 +1053,7 @@ var Client = function (name,homeTile) {
 			// visualFB.reset();
 		}
 		this.equation = "";
+		this.usedChip =[];
 		// console.log(this.equationChip);
 		this.equationChip = [];
 	};

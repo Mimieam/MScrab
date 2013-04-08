@@ -4,6 +4,13 @@ Millestone:
    ✔ check all side of tiles @done (13-04-01 04:22)
    ☐ checking all side of each tile for possible side equations
    ✔ add tile weight before computing @done (13-04-04 06:22)
+   ☐ check tile with disable value
+      ☐ check until we hit an '= sign
+   ☐ check if the new equation is connected to an old one.
+   ☐ every client start with a 0 chip
+
+ ☐ Parser
+    ☐ rewrite  it to  handle multiple equations such at      "2+1 = 3 = 5-2"
 
  ☐ Map rendering
    ✔ basic map with pattern @done (13-03-20 19:28)
@@ -13,6 +20,7 @@ Millestone:
    ✔ tile coloring @done (13-03-21 08:40)
      ☐ make it prettier
    ✔ Special tiles with weight @done (13-03-25 07:46)
+   ☐ add a start tile with a '0' chip disabled-> this would be where the user will start 
 
  ☐ Network data formating
    ☐ use json format
@@ -21,10 +29,12 @@ Millestone:
    ☐ computation
    ☐ animation
    ✔ visual feedback on validation @done (13-04-01 04:23)
+   ☐ fix coloring
 
  ☐ Tunning
    ☐ better color for background and border (need designer help)
-   ☐
+   ☐ 
+   ☐ 
 Bug:
  ☐ Validation equation need more testing
  ✔ chip is offset sometime on drop @done (13-04-04 06:01)
@@ -34,3 +44,12 @@ Tuneup:
  ☐ remove all css from js and use OOCSS
 Tools:
  ☐ Texture Packer = > create a atlas(or sprite sheet) from lots of images
+
+validation rules:
+an equation is true if 
+   ☐ it is make use of a previously used and disabled tile/chip.
+   ☐ if the equation contain at least one  '=' sign 
+   ☐ if the left right hand side of the equation are equal....
+
+Implementation details
+ ☐ 

@@ -1,0 +1,5 @@
+validation rules:
+
+and equation is true if :
+	-it is make use of a previously used and disabled tile/chip.
+	-
