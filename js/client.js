@@ -32,19 +32,19 @@ $(document).ready(function() {
             $( document ).trigger($.Event("mouseup")); //reset mouseHandled flag in ui.mouse
             this._mouseDown( event );
 
-            return false;           
+            return false;
         },
 
         _touchMove: function( event ) {
             this._modifyEvent( event );
-            this._mouseMove( event );   
+            this._mouseMove( event );
         },
 
         _touchEnd: function( event ) {
             this.element
             .unbind( "touchmove." + this.widgetName )
             .unbind( "touchend." + this.widgetName );
-            this._mouseUp( event ); 
+            this._mouseUp( event );
         },
 
         _modifyEvent: function( event ) {
@@ -148,6 +148,64 @@ Game.getBrowserDimension = function  (argument) {
 	return dim;
 };
 
+
+/*================================================================================================*/
+/* This class is in charge of the validation, it will check all the rules and return true or false*/
+/*an equation is true if
+   ☐ it is make use of a previously used and disabled tile/chip.
+   ☐ if the equation contain at least one  '=' sign
+   ☐ if the left right hand side of the equation are equal....
+Arr is the array of chips to be evaluated.
+*/
+Game.rulesValidator = function (Arr, name) {
+	name !== undefined ? this.name = name : this.name ="general";
+	this.Arr = Arr;
+
+	if (this.name == "general") {
+		//check if make use of a previously disabled 
+		is_linked(this.Arr) == true ? console.log("passed check1: is linked"):console.log("not linked");
+		hasEqualSign(this.Arr) == true ? console.log("passed check2: has = sign" ):console.log("no equal sign");
+		checkEquation(this.Arr) == true ? console.log("passed check3: equalities hold" ):console.log("failed equalities");
+
+	}
+
+	// this function generate a string from the Array of used chips and check if they form a valid equation
+	function checkEquation(Arr){
+		// non linked equations 
+			// var i = this.
+
+	}
+
+	function hasEqualSign (Arr) {
+		var i = Arr.length,
+			res = false;
+
+		while (i-- && res == false) {
+			$chip = Arr[i][0];
+			//this.usedChip[i][0] -> goes down to the dom element
+			if ($chip.firstChild.innerHTML == "=") {
+				res =true;
+			};
+		}
+		return res;	
+	}
+
+	function is_linked (Arr) {
+		var i = Arr.length,
+			res = false;
+
+		while (i-- && res == false) {
+			$chip = Arr[i];
+			if ($chip.attr("data-status") == "disabled" && $chip.attr("data-status") !== undefined) {
+				res =true;
+			};
+		}
+		return res;	
+	}
+
+};
+
+
 Game.viewport = Game.getBrowserDimension();
 Game.setWorldDim = function () {
 	$('.world').css({"width":Game.viewport.width,"height":Game.viewport.height});
@@ -249,7 +307,7 @@ function Tile(T, L, status, type) {
 						'data-col': $(this).attr('col')
 					});
 
-					console.log(ui.draggable.attr("id")+ "was dropped at "+$(this).attr('row')+ " - "+$(this).attr('col')); 
+					console.log(ui.draggable.attr("id")+ "was dropped at "+$(this).attr('row')+ " - "+$(this).attr('col'));
 					// ui.draggable.attr();
 					// ui.draggable.attr();
 					// console.log(ui.draggable.attr('data-row'));
@@ -339,12 +397,15 @@ function Region(name, startPt, endPt, Rule){
 
 }
 
+
+
+
 /*================================================================================================*/
 /* a simple visual feedback showing the number of point after validating the equation*/
 function visualFeedback(res, val, ui){
 	'use strict';
 	var color,
-		value="", 
+		value="",
 		target = ui.parent().position(); // the visual feedback will be positioned according to the occupied tile and not the chip
 	res==true? (color = 'green', value = "+"+val) : (color='red',value = "-"+val );
 	var $self = $('#vfb').css({"color":color, "display":"block","top":target.top,"left":target.left,'opacity':1}).text(value);
@@ -352,13 +413,13 @@ function visualFeedback(res, val, ui){
 
 	function r_set(){
 		$('#vfb').removeAttr('style');
-		
+
 	};
 
 	this.reset = function() {
 			// return r_set();
 		$self.css({"font-size":"4em"}).text("");
-		
+
 	};
 
 	function pGetSelf() {
@@ -368,6 +429,18 @@ function visualFeedback(res, val, ui){
 	this.GetSelf = function() {
 			return pGetSelf();
 	};
+
+	// this.animate = function () {
+	// 	$self.animate({
+	// 			'top': '-='+ (CSSs.cell_h +100)+'px',
+	// 			'opacity':"0",
+	// 			'font-size':'20em',
+	// 			'position':"absolute"
+	// 		},2500, function() {
+	// 		    // Animation complete - reset visualFB.
+	// 		   $(this).css({"font-size":"4em"}).text("");
+	// 		});
+	// }
 
 	// return this;
 }
@@ -396,7 +469,7 @@ function Board (divName,r,c,ch,cw,w,h) {
 			// this.DOM_element = divName;
 			// this.tileSet = [];
 			// this.patternStr = "";
-			// this.cols =  Math.ceil(this.width / CSSs.cell_w); 
+			// this.cols =  Math.ceil(this.width / CSSs.cell_w);
 			// this.rows = Math.ceil(this.height / CSSs.cell_h);
 
 //			console.log(this.width);
@@ -551,15 +624,19 @@ Board.prototype = {
 	on drop, a chip register the tile row and col on which it has been dropped,
 	we use those to calculate if the tiles was a special one with a weight.
 
-	this function will return the chip with it's appropirate weigth 
+	this function will return the chip with it's appropirate weigth ( the chip returned is a Jquery object) 
+	
 	*/
-	applyPatternForValidation : function  (chip) {
-		var x = chip.getAttribute('data-row'),
-			y = chip.getAttribute('data-col'),
-			chipValue = (parseInt(chip.firstChild.innerHTML));
+	applyPatternForValidation : function  ($chip) { // will be renamed : Add_tile_weight
+		var rawChip = $chip[0]; // the dom element
+
+		var x = rawChip.getAttribute('data-row'),
+			y = rawChip.getAttribute('data-col'),
+			chipValue = (parseInt(rawChip.firstChild.innerHTML));
 			if (isNaN(chipValue)){
-				console.log("a sign was on a special tile"+ chip.firstChild.innerHTML);
-				return chip.firstChild.innerHTML;
+				console.log("a sign was on a special tile "+ rawChip.firstChild.innerHTML);
+				// return rawChip.firstChild.innerHTML;
+				return $chip;
 			}
 		var r = x%14;  // 15 -1 = # of columns of pattern -1 to wrap onto the next
 		var c = y%14; //  well here its the number of row
@@ -568,32 +645,39 @@ Board.prototype = {
 		   for  (var cell in row ){
 		   		switch (this.pattern[r][c]){
 		   			case 0:
-		   				return chipValue;
+		   				return $chip;
+		   				// return chipValue;
 		   			break;
 
 		   			case 1:
-		   				return chipValue*2; //dbl_number
+		   				$chip[0].firstChild.innerHTML = chipValue*2; 
+		   				return $chip; 
+		   				// return chipValue*2; //dbl_number
 		   				// $(tile).addClass("").html("<span> x2 </span>");
 		   			break;
 
 		   			case 2:
 		   				// $(tile).addClass("tpl_number").html("<span> x3 </span>");
-		   				return chipValue*3; //tpl_number
+		   				$chip[0].firstChild.innerHTML =chipValue*3; //tpl_number
+		   				return $chip;
 		   			break;
 
 		   			case 3:
-		   				return chipValue+4; //dbl_equation
+		   				$chip[0].firstChild.innerHTML = chipValue+4; //dbl_equation
 		   				// $(tile).addClass("dbl_equation").html("<span> +4 </span>");
+						return $chip;		   			
 		   			break;
 
 		   			case 4:
-		   				return chipValue+2; //tpl_equation
+		   				$chip[0].firstChild.innerHTML = chipValue+2; //tpl_equation
 		   				// $(tile).addClass("tpl_equation").html("<span> +2 </span>");
+						return $chip;		   			
 		   			break;
 
 		   			case 5:
-		   				return chipValue*10; //star
+		   				$chip[0].firstChild.innerHTML = chipValue*10; //star
 		   				// $(tile).addClass("star").html("<span> x10 </span>");
+						return $chip;		   			
 		   			break;
 		   		}
 		    }
@@ -634,12 +718,6 @@ Board.prototype = {
 				"x": (top_right.x - top_left.x)/4,
 				"y": 0
 			};
-		// console.log(top_left);
-		// console.log(bottom_left);
-		// console.log(top_right);
-		// console.log(bottom_right);
-		// console.log("horizontal " + this.horizontal_marker.y+" vertical "+this.vertical_marker.x +" bottom_left "+bottom_left.y  );
-		//console.log("horizontal_marker: "+ this.horizontal_marker.y );
 
 			// default bottom > marker - so check the opposite
 		if(bottom_left.y < this.horizontal_marker.y ){
@@ -680,7 +758,7 @@ Board.prototype = {
 			var checkpoint = (top_left.x%Game.viewport.width),
 			lastCol = 0,
 			startingCol = -Math.floor(ui.position.left/(CSSs.cell_h + CSSs.spacing)),
-			endingCol = -Math.floor((ui.position.left - this.vertical_marker.x)/(CSSs.cell_h + CSSs.spacing)); 
+			endingCol = -Math.floor((ui.position.left - this.vertical_marker.x)/(CSSs.cell_h + CSSs.spacing));
 			// if (Game.stop_update == 0){
 			if (( Math.floor(Game.viewport.width/3)< checkpoint < Math.floor(Game.viewport.width/3))&& ( lastCol!= startingCol)){
 			// if ( (Math.ceil(Game.viewport.width/3)-1 < checkpoint) || (checkpoint < Math.ceil(Game.viewport.width/3))) 	{
@@ -799,7 +877,8 @@ function ChipHolder(_DOM_element) {
 	this.sendInvalidBackToRack = function (Arr) {
 		var $chip;
 		for (var i = 0; i < Arr.length; i++) {
-				$chip = Arr[i];
+
+			$chip = Arr[i];
 			if ($chip.attr("data-status") != "disabled") {
 					$chip.attr("data-status", "active")
 						.attr("data-row", null)
@@ -855,7 +934,8 @@ var Client = function (name,homeTile) {
 	}
 
 	function pSetScore(num) {
-		score +=num;
+		if(!isNaN(num))
+			score +=num;
 	}
 
 	this.getScore = function() {  // priviledge function - will access my private function - don't work with prototype... sigh..
@@ -967,7 +1047,7 @@ var Client = function (name,homeTile) {
 	/* we are going from the last chip*/
 	this.validate = function() {
 
-		//  
+		//
 		if (this.usedChip.length === 0)
 			return -1;
 		else {
@@ -1003,37 +1083,41 @@ var Client = function (name,homeTile) {
 		}
 // console.log(this.equation);
 		console.log(this.usedChip);
-		var weightedEquation = [];
+		var $weightedEquation = [];
 		for (var i = 0; i < this.usedChip.length; i++) {
-			 weightedEquation.push(myBoard.applyPatternForValidation(this.usedChip[i][0]));
+			 $weightedEquation.push(myBoard.applyPatternForValidation(this.equationChip[i]));
 		};
-			 console.log(weightedEquation);
-		for (var i = 0; i < this.usedChip.length; i++) {
-			 console.log((this.usedChip[i][0]));
-		};
+			 console.log($weightedEquation);
+		// for (var i = 0; i < this.usedChip.length; i++) {
+		// 	 console.log((this.usedChip[i][0]));
+		// };
 
 		console.log("let's parse the equation: ");
 
 		var equation = this.equation.replace(/<\/?[^>]+(>|$)/g, ""); //remove span tags
-		console.log(equation);
-			equation = equation.replace(/\|/g,''); //remove | delimiter
+		// console.log(equation);
+		// 	equation = equation.replace(/\|/g,''); //remove | delimiter
 		console.log(equation);
 		try{
-			var result = this.parseEquation(equation);
-			console.log(this.parseEquation("3=3=3"));
-			console.log(this.parseEquation("3+2*2=7+9-8-1=2*3+1"));
-			console.log(this.parseEquation("2=2=2+1"));
+			console.log(this.equationChip.toString());
+			printChips(this.equationChip);
+			// console.log(this.equationChip.toString());
+			// var result = this.parseEquation(equation);
+			var result = this.parseEquation($weightedEquation);
+			// console.log(this.parseEquation("3=3=3"));
+			// console.log(this.parseEquation("3+2*2=7+9-8-1=2*3+1"));
+			// console.log(this.parseEquation("2=2=2+1"));
+			console.log(result);
 
 		}catch(e){
-			alert(e);
+			console.error(e);
 			this.rack.sendInvalidBackToRack (this.usedChip);
-			result ="Yo mama would be ashamed!!!"
 		}
 
 		console.log(result);
 		console.log($(this.usedChip[this.usedChip.length -1 ]));
 
-		if (1){//  vadiation condition
+		if ( Game.rulesValidator ($weightedEquation) ){//  validation condition
 			this.setScore(result);
 			$('#info span').text(this.getScore());
 			var visualFB = new visualFeedback(false ,result, $(this.usedChip[this.usedChip.length -1 ]))
@@ -1045,12 +1129,24 @@ var Client = function (name,homeTile) {
 			},2500, function() {
 			    // Animation complete - reset visualFB.
 			   $(this).css({"font-size":"4em"}).text("");
-			  });
+			});
 			this.rack.reset();
 			this.disable_on_validation();
 			this.rack.makeNewSet(7,4,1);
 			this.rack.getChips();
 			// visualFB.reset();
+		}else{  // invalid equation
+			result ="Yo mama would be ashamed!!!"
+			var visualFB = new visualFeedback(false ,result, $(this.usedChip[this.usedChip.length -1 ]))
+			visualFB.GetSelf().animate({
+				'top': '-='+ (CSSs.cell_h +100)+'px',
+				'opacity':"0",
+				'font-size':'20em',
+				'position':"absolute"
+			},2500, function() {
+			    // Animation complete - reset visualFB.
+			   $(this).css({"font-size":"4em"}).text("");
+			});
 		}
 		this.equation = "";
 		this.usedChip =[];
@@ -1065,9 +1161,26 @@ var Client = function (name,homeTile) {
 		};
 	};
 	this.parseEquation = function (_myEquation) {
-		return EquationParser.parse(_myEquation);  //Peg.js generated grammar parser
+		var equation = _myEquation.toString(); // convert array to string
+		console.log(equation);
+			equation = equation.replace(/<\/?[^>]+(>|$)/g, ""); //remove span tags
+		console.log(equation);
+			equation = equation.replace(/\|/g,''); //remove | delimiter
+			equation = equation.replace(/\,/g,''); //remove | delimiter
+		console.log(equation);
+
+		// return EquationParser.parse(_myEquation);  //Peg.js generated grammar parser
+		return EquationParser.parse(equation);  //Peg.js generated grammar parser
 	};
 };
+
+function printChips (Arr) {
+	var res = "";
+	for (var i = 0; i < Arr.length; i++) {
+		res += Arr[i][0].innerHTML;
+	};
+	console.log(res);
+}
 /*================================================================================================*/
 
 // board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
@@ -1082,6 +1195,6 @@ var Client = function (name,homeTile) {
 	});
 	(new Tile(0,0)).makeAllTileDroppable('.tile', Mimi);
 
-	document.onselectstart = function () { return false; } 
+	document.onselectstart = function () { return false; }
 
 });
