@@ -60,6 +60,12 @@ body {
     position:relative;
 }
 
+.home{
+    background: gold;
+    content:"H";
+    font-size: 200px;
+}
+
 /*0 = empty
 1 = double number score
 2 = triple number score

@@ -4,10 +4,11 @@ Millestone:
    ✔ check all side of tiles @done (13-04-01 04:22)
    ☐ checking all side of each tile for possible side equations
    ✔ add tile weight before computing @done (13-04-04 06:22)
-   ☐ check tile with disable value
-      ☐ check until we hit an '= sign
-   ☐ check if the new equation is connected to an old one.
-   ☐ every client start with a 0 chip
+      ☐ bug - weight is added on validation even when equation is not correct - need to keep track of old number
+   ✔ check tile with disable value @done (13-06-29 20:17)
+      ✔ check until we hit an '= sign @done (13-06-29 20:17)
+   ✔ check if the new equation is connected to an old one. @done (13-06-29 20:17)
+   ✔ reset css of chips sent back to rack  see - sendInvalidBackToRack() @done (13-06-06 18:19)
 
  ✔ Parser @done (13-04-08 18:50)
     ✔ rewrite  it to  handle multiple equations such at      "2+1 = 3 = 5-2" @done (13-04-08 18:50)
@@ -20,7 +21,9 @@ Millestone:
    ✔ tile coloring @done (13-03-21 08:40)
      ☐ make it prettier
    ✔ Special tiles with weight @done (13-03-25 07:46)
-   ☐ add a start tile with a '0' chip disabled-> this would be where the user will start 
+   ✔ add homeTile @done (13-06-29 20:19)
+     ☐ make it pretty 
+
 
  ☐ Network data formating
    ☐ use json format
@@ -28,7 +31,7 @@ Millestone:
  ☐ Scoring
    ☐ computation
    ☐ animation
-   ✔ visual feedback on validation @done (13-04-01 04:23)
+      ✔ visual feedback on validation @done (13-04-01 04:23)
    ☐ fix coloring
 
  ☐ Tunning
@@ -47,9 +50,9 @@ Tools:
 
 validation rules:
 an equation is true if 
-   ☐ it is make use of a previously used and disabled tile/chip.
-   ☐ if the equation contain at least one  '=' sign 
-   ☐ if the left right hand side of the equation are equal....
+   ✔ it is make use of a previously used and disabled tile/chip. @done (13-06-06 17:23)
+   ✔ if the equation contain at least one  '=' sign @done (13-06-06 17:23)
+   ✔ if the left & right hand side of the equation are equal.... @done (13-06-06 17:23)
 
 Implementation details
  ☐ 

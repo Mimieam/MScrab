@@ -157,22 +157,47 @@ Game.getBrowserDimension = function  (argument) {
    ☐ if the left right hand side of the equation are equal....
 Arr is the array of chips to be evaluated.
 */
-Game.rulesValidator = function (Arr, name) {
+Game.rulesValidator = function (Arr, ArrValues_str , name) {
 	name !== undefined ? this.name = name : this.name ="general";
 	this.Arr = Arr;
-
+	var linked, gotEqual, res;
 	if (this.name == "general") {
 		//check if make use of a previously disabled 
-		is_linked(this.Arr) == true ? console.log("passed check1: is linked"):console.log("not linked");
-		hasEqualSign(this.Arr) == true ? console.log("passed check2: has = sign" ):console.log("no equal sign");
-		checkEquation(this.Arr) == true ? console.log("passed check3: equalities hold" ):console.log("failed equalities");
-
+		(linked = is_linked(this.Arr))?(  // == true ? console.log("passed check1: is linked"):console.log("not linked");
+			(gotEqual = hasEqualSign(this.Arr))?(  // == true ? console.log("passed check2: has = sign" ):console.log("no equal sign");
+				(res = checkEquation(ArrValues_str))? //!= false ? console.log("passed check3: equalities hold" ):console.log("failed equalities");
+				console.log(res): console.log("trouble with evaluation of the expression")
+			): console.log('no =')
+		): console.log('not linked')
+		/*
+			FOR TESTING ONLY - REMOVE THAT IN PRODUCTION
+		*/
+		// linked = is_linked(this.Arr) == true ? console.log("passed check1: is linked"):console.log("not linked");
+		// gotEqual = hasEqualSign(this.Arr) == true ? console.log("passed check2: has = sign" ):consolnolog("no equal sign");
+		// (res = checkEquation(ArrValues_str)) != false ? console.log("passed check3: equalities hold" ):console.log("failed equalities");
+		// linked = true;
+		// gotEqual =true;
+		return (linked && gotEqual && (res!=false)) ? res: undefined;
 	}
 
 	// this function generate a string from the Array of used chips and check if they form a valid equation
-	function checkEquation(Arr){
+	function checkEquation(ArrValues_str){
 		// non linked equations 
-			// var i = this.
+			var equation = ArrValues_str; // convert array to string
+		console.log(equation);
+			equation = equation.replace(/<\/?[^>]+(>|$)/g, ""); //remove span tags
+		console.log(equation);
+			equation = equation.replace(/\|/g,''); //remove | delimiter
+			equation = equation.replace(/\,/g,''); //remove | delimiter
+		console.log(equation);
+		try{
+			// return EquationParser.parse(_myEquation);  //Peg.js generated grammar parser
+			console.log("equation Left handside"+equation.split('=')[0])
+			  //return the left handside of the equation - EVIL EVAL - I will change this monstruositywhen i'm rested ...
+			return (EquationParser.parse(equation) ? eval(equation.split('=')[0]):false);  //Peg.js generated grammar parser
+		}catch(e){
+			console.error(e);
+		}
 
 	}
 
@@ -196,7 +221,7 @@ Game.rulesValidator = function (Arr, name) {
 
 		while (i-- && res == false) {
 			$chip = Arr[i];
-			if ($chip.attr("data-status") == "disabled" && $chip.attr("data-status") !== undefined) {
+			if (($chip.parent().attr("data-status")== "home" || $chip.attr("data-status") == "disabled")) { // probably a redundant condition - actually i know it's redundant
 				res =true;
 			};
 		}
@@ -326,15 +351,18 @@ function Tile(T, L, status, type) {
 					// if(!$(this).hasClass("transform-h-x"))  // just messing around with 2.5D
 					//$(".tile").addClass('transform-h-x');
 
-					$("#board").on('dblclick', '.chip', function() {
-						var $chip = $(this);
+					// $('#board').on('dblclick', '.chip p', function() {
+					$("#board").on('dblclick','.chip p', function() {	
+						var $chip = $(this).parent();
+						// Mimi.rack.sendInvalidBackToRack([$chip])
+						console.log($chip +"-status- :"+$chip.attr("data-status"));
 						if ($chip.attr("data-status") != "disabled") {
 							$chip.attr("data-status", "active")
 								.attr("data-row", null)
 								.attr("data-col", null);
 
 							$chip.removeAttr("style");
-							$chip.addClass("is-BackOnRack").removeClass("is-OnBoard").detach()
+							$chip.addClass("is-BackOnRack").css('background','rgb(242, 242, 242)').removeClass("is-OnBoard").detach()
 							// console.log($chip.data('type'));
 							if ($chip.data('type') == "num") $('#rack ul li:nth-child(1)').append($chip);
 							if ($chip.data('type') == "op") $('#rack ul li:nth-child(2)').append($chip);
@@ -345,6 +373,8 @@ function Tile(T, L, status, type) {
 							}); //remove from usedChip if we remove the chip from the board
 						}
 					});
+
+					
 
 					if ($(this).children('div').length == 0) {
 						// ui.draggable.css({
@@ -484,21 +514,37 @@ function Board (divName,r,c,ch,cw,w,h) {
 			this.patternStr = "";
 			this.cols = c || Math.floor(this.height / CSSs.cell_h);
 			this.rows = r || Math.floor(this.width / CSSs.cell_w);
-			this.pattern =[[4,0,0,1,0,0,0,4,0,0,0,1,0,0,4],
-				           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
-				           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
-				           [1,0,0,3,0,0,0,1,0,0,0,3,0,0,1],
-				           [0,0,0,0,3,0,0,0,0,0,3,0,0,0,0],
-				           [0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
-				           [0,0,1,0,0,0,1,0,1,0,0,0,1,0,0],
-				           [4,0,0,1,0,0,0,5,0,0,0,1,0,0,4],
-				           [0,0,1,0,0,0,1,0,1,0,0,0,1,0,0],
-				           [0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
-				           [0,0,0,0,3,0,0,0,0,0,3,0,0,0,0],
-				           [1,0,0,3,0,0,0,1,0,0,0,3,0,0,1],
-				           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
-				           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
-				           [4,0,0,1,0,0,0,4,0,0,0,1,0,0,4]];
+			// this.pattern =[[4,0,0,1,0,0,0,4,0,0,0,1,0,0,4],
+			// 	           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
+			// 	           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
+			// 	           [1,0,0,3,0,0,0,1,0,0,0,3,0,0,1],
+			// 	           [0,0,0,0,3,0,0,0,0,0,3,0,0,0,0],
+			// 	           [0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+			// 	           [0,0,1,0,0,0,1,0,1,0,0,0,1,0,0],
+			// 	           [4,0,0,1,0,0,0,5,0,0,0,1,0,0,4],
+			// 	           [0,0,1,0,0,0,1,0,1,0,0,0,1,0,0],
+			// 	           [0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+			// 	           [0,0,0,0,3,0,0,0,0,0,3,0,0,0,0],
+			// 	           [1,0,0,3,0,0,0,1,0,0,0,3,0,0,1],
+			// 	           [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
+			// 	           [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
+			// 	           [4,0,0,1,0,0,0,4,0,0,0,1,0,0,4]];
+
+			this.pattern =[[4,0,0,0,0,0,0,4,0,0,0,0,0,0,4],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [4,0,0,0,0,0,0,5,0,0,0,0,0,0,4],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				           [4,0,0,0,0,0,0,4,0,0,0,0,0,0,4]];
 
 			this.top_left_corner =  {
 				"x":0,
@@ -876,16 +922,18 @@ function ChipHolder(_DOM_element) {
 
 	this.sendInvalidBackToRack = function (Arr) {
 		var $chip;
-		for (var i = 0; i < Arr.length; i++) {
-
+		// for (var i = 0; i < Arr.length; i++) {
+		var i = 0;
+		while(Arr.length!=0) {
 			$chip = Arr[i];
 			if ($chip.attr("data-status") != "disabled") {
 					$chip.attr("data-status", "active")
 						.attr("data-row", null)
 						.attr("data-col", null);
+					//reset css of chips 
 
 					$chip.removeAttr("style");
-					$chip.addClass("is-BackOnRack").removeClass("is-OnBoard").detach()
+					$chip.addClass("is-BackOnRack").css('background','rgb(242, 242, 242)').removeClass("is-OnBoard").detach()
 					// console.log($chip.data('type'));
 					if ($chip.data('type') == "num") $('#rack ul li:nth-child(1)').append($chip);
 					if ($chip.data('type') == "op") $('#rack ul li:nth-child(2)').append($chip);
@@ -895,6 +943,7 @@ function ChipHolder(_DOM_element) {
 						return v.attr('id') == $chip.attr('id') ? false : true;
 					}); //remove from usedChip if we remove the chip from the board
 			};
+			i = Arr.length - 1;
 		}
 	}
 
@@ -915,7 +964,8 @@ var Client = function (name,homeTile) {
 	'use strict';
 	this.name=name;
 	var score = 0;
-	this.home = homeTile;
+	this.home = beMyHome(homeTile);
+
 	this.Move = "";
 	this.equation = "";
 	this.equationChip = [];
@@ -935,7 +985,7 @@ var Client = function (name,homeTile) {
 
 	function pSetScore(num) {
 		if(!isNaN(num))
-			score +=num;
+			score += parseInt(num);
 	}
 
 	this.getScore = function() {  // priviledge function - will access my private function - don't work with prototype... sigh..
@@ -951,13 +1001,22 @@ var Client = function (name,homeTile) {
 		return this.home;
 	};
 
-	this.printUsedTile = function (argument) {
-		var currChip="";
-		for (var i = this.usedChip.length - 1; i >= 0; i--) {
-			currChip +=" "+ $(this.usedChip[i]).html();
-		}
-		return currChip;
+
+	function beMyHome() { // TODO: add condition to be a home tile
+		var self = $(homeTile);
+		self.removeClass("pattern").addClass("home").attr({"data-status":"home"});
+		console.log(self);
+		return self;		
 	};
+
+
+	// this.printUsedTile = function (argument) {
+	// 	var currChip="";
+	// 	for (var i = this.usedChip.length - 1; i >= 0; i--) {
+	// 		currChip +=" "+ $(this.usedChip[i]).html();
+	// 	}
+	// 	return currChip;
+	// };
 
 	function getChipNeighbor (orientation,element){
 		var Row = parseInt($(element).attr('data-row'), 10);    // (10) here is the radix parameter for parseInt
@@ -1084,13 +1143,10 @@ var Client = function (name,homeTile) {
 // console.log(this.equation);
 		console.log(this.usedChip);
 		var $weightedEquation = [];
-		for (var i = 0; i < this.usedChip.length; i++) {
+		for (var i = 0; i < this.equationChip.length; i++) {
 			 $weightedEquation.push(myBoard.applyPatternForValidation(this.equationChip[i]));
 		};
 			 console.log($weightedEquation);
-		// for (var i = 0; i < this.usedChip.length; i++) {
-		// 	 console.log((this.usedChip[i][0]));
-		// };
 
 		console.log("let's parse the equation: ");
 
@@ -1098,29 +1154,33 @@ var Client = function (name,homeTile) {
 		// console.log(equation);
 		// 	equation = equation.replace(/\|/g,''); //remove | delimiter
 		console.log(equation);
-		try{
-			console.log(this.equationChip.toString());
-			printChips(this.equationChip);
+		
+			// console.log(this.equationChip.toString());
+			var chipStr = printChips(this.equationChip);
+			// printChips($weightedEquation[0]);
+			// printChips($weightedEquation);
 			// console.log(this.equationChip.toString());
 			// var result = this.parseEquation(equation);
-			var result = this.parseEquation($weightedEquation);
+			// var result = this.parseEquation($weightedEquation[0]);
 			// console.log(this.parseEquation("3=3=3"));
 			// console.log(this.parseEquation("3+2*2=7+9-8-1=2*3+1"));
 			// console.log(this.parseEquation("2=2=2+1"));
-			console.log(result);
+			// console.log(result);
+		try{
 
 		}catch(e){
 			console.error(e);
 			this.rack.sendInvalidBackToRack (this.usedChip);
 		}
 
-		console.log(result);
+		// console.log(result);
 		console.log($(this.usedChip[this.usedChip.length -1 ]));
-
-		if ( Game.rulesValidator ($weightedEquation) ){//  validation condition
+			var result = 0;
+		if ( (result = Game.rulesValidator ($weightedEquation,chipStr)) != undefined ){//  validation condition
+			// if(isNaN(result))
 			this.setScore(result);
 			$('#info span').text(this.getScore());
-			var visualFB = new visualFeedback(false ,result, $(this.usedChip[this.usedChip.length -1 ]))
+			var visualFB = new visualFeedback(true ,result, $(this.usedChip[this.usedChip.length -1 ]))
 			visualFB.GetSelf().animate({
 				'top': '-='+ (CSSs.cell_h +100)+'px',
 				'opacity':"0",
@@ -1174,19 +1234,21 @@ var Client = function (name,homeTile) {
 	};
 };
 
+/*print the values of a array of DOM - used to print the Chips to be served to the equation parser*/
 function printChips (Arr) {
 	var res = "";
 	for (var i = 0; i < Arr.length; i++) {
 		res += Arr[i][0].innerHTML;
 	};
 	console.log(res);
+	return res;	
 }
 /*================================================================================================*/
 
 // board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
 	var myBoard = new Board("#board",15,15);
 	myBoard.buildGrid("#board",CSSs,0,0);
-	Mimi = new Client("Mimi");
+	Mimi = new Client("Mimi","#tile_34"); //tile_34 = home tile
 	Game.setWorldDim();
 	$('#board').draggable({ //will be move into Board class soon
 		// drag: function (event, ui) {
