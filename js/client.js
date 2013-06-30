@@ -67,14 +67,14 @@ $('#info').hover(function() {
 
 var CSSs = new (function  () { /*will be moved to the .css*/
 	this.spacing = 5;
-	this.cell_w = 200;
-	this.cell_h = 200;
+	this.cell_w = 150;
+	this.cell_h = 150;
 	this.ChipColor = '#F2F2F2';
 	this.TilesColor = '';
 	this.left = 0;
 	this.top =0;
-	this.Chip = {zIndex:"0", position: "relative","width":this.cell_w/2, "height":this.cell_h/2,background: this.ChipColor };
-	this.Tile = {zIndex:"0", position: "absolute", width: this.cell_w,height: this.cell_h,background: this.TilesColor, top: this.top ,left: this.left };
+	this.Chip = {zIndex:"0", position: "relative","max-width":this.cell_w/2, "max-height":this.cell_h/2,background: this.ChipColor };
+	this.Tile = {zIndex:"0", position: "absolute", "max-width": this.cell_w, "max-height": this.cell_h,background: this.TilesColor, top: this.top ,left: this.left };
 }) ();
 
 /*================================================================================================*/
@@ -177,7 +177,7 @@ Game.rulesValidator = function (Arr, ArrValues_str , name) {
 		// (res = checkEquation(ArrValues_str)) != false ? console.log("passed check3: equalities hold" ):console.log("failed equalities");
 		// linked = true;
 		// gotEqual =true;
-		return (linked && gotEqual && (res!=false)) ? res: undefined;
+		return (linked && gotEqual && (res!="FAILED")) ? res: undefined;
 	}
 
 	// this function generate a string from the Array of used chips and check if they form a valid equation
@@ -194,7 +194,8 @@ Game.rulesValidator = function (Arr, ArrValues_str , name) {
 			// return EquationParser.parse(_myEquation);  //Peg.js generated grammar parser
 			console.log("equation Left handside"+equation.split('=')[0])
 			  //return the left handside of the equation - EVIL EVAL - I will change this monstruositywhen i'm rested ...
-			return (EquationParser.parse(equation) ? eval(equation.split('=')[0]):false);  //Peg.js generated grammar parser
+			return (EquationParser.parse(equation) ? eval(equation.split('=')[0]):"FAILED");  //Peg.js generated grammar parser
+		
 		}catch(e){
 			console.error(e);
 		}
@@ -323,8 +324,8 @@ function Tile(T, L, status, type) {
 				hoverClass: 'hovered',
 				drop: function(event, ui) {
 					ui.draggable.css({
-						"width": "200px",
-						"height": "200px"
+						"width": CSSs.cell_w,
+						"height": CSSs.cell_h
 					})
 						.attr({
 						'data-droppedIn': this.id,
@@ -386,7 +387,7 @@ function Tile(T, L, status, type) {
 						// 					height:"200px"
 						// 			});
 						ui.draggable.removeAttr("style");
-						ui.draggable.addClass("is-OnBoard");
+						ui.draggable.addClass("is-OnBoard").css({width:CSSs.cell_w,height:CSSs.cell_h});
 						ui.draggable.detach();
 						$(this).append(ui.draggable);
 					} else {
