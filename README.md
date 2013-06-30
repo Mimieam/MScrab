@@ -45,3 +45,5 @@ World
 ![ScreenShot](https://raw.github.com/Mimieam/MScrab/master/img/First%20Millestone.png)
 as of  (01-04-13 04:22)
 ![ScreenShot](https://raw.github.com/Mimieam/MScrab/master/img/2nd%20Stone.png)
+as of (6/30/2013)
+![ScreenShot](https://raw.github.com/Mimieam/MScrab/master/img/hahaBugFound.png)
