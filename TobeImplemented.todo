@@ -9,10 +9,12 @@ Millestone:
       ✔ check until we hit an '= sign @done (13-06-29 20:17)
    ✔ check if the new equation is connected to an old one. @done (13-06-29 20:17)
    ✔ reset css of chips sent back to rack  see - sendInvalidBackToRack() @done (13-06-06 18:19)
+   ☐ improve scoring ( add the the number of used chip to the scoring - maybe 2pt per chips used in equation)
+
 
  ✔ Parser @done (13-04-08 18:50)
     ✔ rewrite  it to  handle multiple equations such at      "2+1 = 3 = 5-2" @done (13-04-08 18:50)
-
+     
 
  ☐ Map rendering
    ✔ basic map with pattern @done (13-03-20 19:28)
@@ -30,14 +32,20 @@ Millestone:
 
  ☐ Scoring
    ☐ computation
+      ☐ while computing the score of an equation with multiple equalities - multiply by equalities - 1
+      ☐ 
+      ☐ 
    ☐ animation
       ✔ visual feedback on validation @done (13-04-01 04:23)
+      ☐ multiple visual feedback need to be fired for each step of evaluation 
    ☐ fix coloring
 
  ☐ Tunning
    ☐ better color for background and border (need designer help)
-   ☐ 
-   ☐ 
+
+ ☐ Rack
+     ✔ refill rack instead of reseting it @done (13-06-30 21:28)
+      
 Bug:
  ☐ Validation equation need more testing
  ✔ chip is offset sometime on drop @done (13-04-04 06:01)

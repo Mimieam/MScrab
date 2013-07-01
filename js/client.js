@@ -869,6 +869,48 @@ function ChipHolder(_DOM_element) {
 		}
 	};
 
+	this.refill = function(_num,_op,_Eq) {
+		number = [];
+		opSign = [];
+		eqSign = [];
+		Symbols = null;
+		this.makeNewSet(_num,_op,_Eq);
+
+		for (var i = number.length|| _num; i > 0; i--) {
+			NewNumChip( new Chip("num", Game.getRandomInt(0,9)));
+		}
+
+		for (var j = opSign.length || _op; j > 0; j--) {
+			NewOpChip(new Chip("op", Game.getRandomSign()));
+		}
+
+		for (var k = _Eq; k > 0; k--) {
+			NewEqChip(new Chip("eq", "="));
+		}
+		// $(this.DOM_element).empty();	
+
+		//-------------------------------------------------//
+		var rack_num = $('#rack ul li:nth-child(1)');
+		var rack_sign = $('#rack ul li:nth-child(2)');
+		var rack_eq = $('#rack ul li:nth-child(3)');
+
+		for (var i = rack_num.children().length ; i < _num ; i++) {
+			rack_num.append(number[i].GetSelf()[0]);
+		}
+		// rack.append(num);
+
+		for (var i = rack_sign.children().length ; i < _op ; i++) {
+			rack_sign.append(opSign[i].GetSelf()[0]);
+		}
+		// rack.append(op);
+
+		for (var i = rack_eq.children().length ; i < _Eq ; i++) {
+			rack_eq.append(eqSign[i].GetSelf()[0]);
+		}
+		// rack.append(eq);
+
+	};
+
 	// /* push the new chips onto the rack*/
 	// this.getChips = function( ) {
 	// 	for (var i = number.length - 1; i >= 0; i--) {
@@ -1159,7 +1201,9 @@ var Client = function (name,homeTile) {
 			// console.log(this.equationChip.toString());
 			var chipStr = printChips(this.equationChip);
 			// printChips($weightedEquation[0]);
-			// printChips($weightedEquation);
+			// printC
+	
+			//printChips($weightedEquation);
 			// console.log(this.equationChip.toString());
 			// var result = this.parseEquation(equation);
 			// var result = this.parseEquation($weightedEquation[0]);
@@ -1191,11 +1235,12 @@ var Client = function (name,homeTile) {
 			    // Animation complete - reset visualFB.
 			   $(this).css({"font-size":"4em"}).text("");
 			});
-			this.rack.reset();
+			this.rack.refill(7,4,1);
+			// this.rack.reset();
 			this.disable_on_validation();
-			this.rack.makeNewSet(7,4,1);
-			this.rack.getChips();
-			// visualFB.reset();
+			// this.rack.makeNewSet(7,4,1);
+			// this.rack.getChips();
+			// visualthis.FB.reset();
 		}else{  // invalid equation
 			result ="Yo mama would be ashamed!!!"
 			var visualFB = new visualFeedback(false ,result, $(this.usedChip[this.usedChip.length -1 ]))
