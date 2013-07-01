@@ -1,6 +1,7 @@
 MScrab
 ======
 
+The live version is [here](http://echimane.com/scrabb/)
 #####Basic Squeleton
 <pre>
 World
