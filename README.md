@@ -1,7 +1,7 @@
 MScrab
 ======
 
-The live version is [here](http://echimane.com/scrabb/)
+The live version is [here](http://echimane.com/scrabb/) - The first equation need to be set on the 'Yellow' Tile ( considered to be the home tile of a user )
 #####Basic Squeleton
 <pre>
 World
