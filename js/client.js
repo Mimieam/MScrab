@@ -1,62 +1,99 @@
 $(document).ready(function() {
-
-(function( $ ) {
-
-    $.support.touch = typeof Touch === 'object';
-
-    if (!$.support.touch) {
-        return;
-    }
-
-    var proto =  $.ui.mouse.prototype,
-    _mouseInit = proto._mouseInit;
-
-    $.extend( proto, {
-        _mouseInit: function() {
-            this.element
-            .bind( "touchstart." + this.widgetName, $.proxy( this, "_touchStart" ) );
-            _mouseInit.apply( this, arguments );
-        },
-
-        _touchStart: function( event ) {
-            if ( event.originalEvent.targetTouches.length != 1 ) {
-                return false;
-            }
-
-            this.element
-            .bind( "touchmove." + this.widgetName, $.proxy( this, "_touchMove" ) )
-            .bind( "touchend." + this.widgetName, $.proxy( this, "_touchEnd" ) );
-
-            this._modifyEvent( event );
-
-            $( document ).trigger($.Event("mouseup")); //reset mouseHandled flag in ui.mouse
-            this._mouseDown( event );
-
-            return false;
-        },
-
-        _touchMove: function( event ) {
-            this._modifyEvent( event );
-            this._mouseMove( event );
-        },
-
-        _touchEnd: function( event ) {
-            this.element
-            .unbind( "touchmove." + this.widgetName )
-            .unbind( "touchend." + this.widgetName );
-            this._mouseUp( event );
-        },
-
-        _modifyEvent: function( event ) {
-            event.which = 1;
-            var target = event.originalEvent.targetTouches[0];
-            event.pageX = target.clientX;
-            event.pageY = target.clientY;
+  /**
+     * requestAnimationFrame and cancel polyfill
+     */
+    (function() {
+        var lastTime = 0;
+        var vendors = ['ms', 'moz', 'webkit', 'o'];
+        for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+            window.cancelAnimationFrame =
+                    window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
         }
 
-    });
+        if (!window.requestAnimationFrame)
+            window.requestAnimationFrame = function(callback, element) {
+                var currTime = new Date().getTime();
+                var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+                        timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
 
-})( jQuery );
+        if (!window.cancelAnimationFrame)
+            window.cancelAnimationFrame = function(id) {
+                clearTimeout(id);
+            };
+    }());
+
+// (function( $ ) {
+
+//     $.support.touch = typeof Touch === 'object';
+
+//     if (!$.support.touch) {
+//         return;
+//     }
+
+//     var proto =  $.ui.mouse.prototype,
+//     _mouseInit = proto._mouseInit;
+
+//     $.extend( proto, {
+//         _mouseInit: function() {
+//             this.element
+//             .bind( "touchstart." + this.widgetName, $.proxy( this, "_touchStart" ) );
+//             _mouseInit.apply( this, arguments );
+//         },
+
+//         _touchStart: function( event ) {
+//             if ( event.originalEvent.targetTouches.length != 1 ) {
+//                 return false;
+//             }
+
+//             this.element
+//             .bind( "touchmove." + this.widgetName, $.proxy( this, "_touchMove" ) )
+//             .bind( "touchend." + this.widgetName, $.proxy( this, "_touchEnd" ) );
+
+//             this._modifyEvent( event );
+
+//             $( document ).trigger($.Event("mouseup")); //reset mouseHandled flag in ui.mouse
+//             this._mouseDown( event );
+
+//             return false;
+//         },
+
+//         _touchMove: function( event ) {
+//             this._modifyEvent( event );
+//             this._mouseMove( event );
+//         },
+
+//         _touchEnd: function( event ) {
+//             this.element
+//             .unbind( "touchmove." + this.widgetName )
+//             .unbind( "touchend." + this.widgetName );
+//             this._mouseUp( event );
+//         },
+
+//         _modifyEvent: function( event ) {
+//             event.which = 1;
+//             var target = event.originalEvent.targetTouches[0];
+//             event.pageX = target.clientX;
+//             event.pageY = target.clientY;
+//         }
+
+//     });
+
+// })( jQuery );
+
+(function ($) {
+       $.fn.liveDroppable = function (opts) {
+          this.live("mouseenter", function() {
+             if (!$(this).data("init")) {
+                $(this).data("init", true).droppable(opts);
+             }
+          });
+       };
+}(jQuery));
 
 $('#info').hover(function() {
     $('#stats').stop(true, true).slideDown("fast");
@@ -101,8 +138,8 @@ Game.show_props = function (obj, objName) {
 };
 
 Game.validateBoard = function(client){
-		Mimi.equation = "";
-		Mimi.equationChip = [];
+		//Mimi.equation = "";
+		//Mimi.equationChip = [];
 		Mimi.validate();
  };
 
@@ -190,14 +227,15 @@ Game.rulesValidator = function (Arr, ArrValues_str , name) {
 			equation = equation.replace(/\|/g,''); //remove | delimiter
 			equation = equation.replace(/\,/g,''); //remove | delimiter
 		console.log(equation);
-		try{
 			// return EquationParser.parse(_myEquation);  //Peg.js generated grammar parser
 			console.log("equation Left handside"+equation.split('=')[0])
 			  //return the left handside of the equation - EVIL EVAL - I will change this monstruositywhen i'm rested ...
+		try{
 			return (EquationParser.parse(equation) ? eval(equation.split('=')[0]):"FAILED");  //Peg.js generated grammar parser
 		
 		}catch(e){
 			console.error(e);
+			console.log("equation not evaluated because "+ e);
 		}
 
 	}
@@ -236,6 +274,28 @@ Game.viewport = Game.getBrowserDimension();
 Game.setWorldDim = function () {
 	$('.world').css({"width":Game.viewport.width,"height":Game.viewport.height});
 	// $('#board').css({"width":Game.viewport.width,"height":Game.viewport.height});
+}
+Game.chipReset = function () {
+	if (Mimi!==undefined) {
+
+		//remove all chip not disabled by validation
+		var chips = $('#board').find('.chip'),
+			status = chips.attr('data-status');
+		// if(status != undefined || status != 'disabled' ){
+			for(var x = 0 ; x < chips.length ; x++)
+				if (chips[x].getAttribute('data-status') != 'disabled') {
+					$(chips[x]).fadeOut('slow').remove();
+				};
+		// }
+			// $(".ResetBtn").on("click",function () {
+
+			Mimi.rack.reset();
+			Mimi.rack.makeNewSet(7,4,1);
+			Mimi.rack.getChips();
+	// });
+	}else{
+		console.error("Client not defined");
+	};
 }
 /*================================================================================================*/
 function Chip(type,value) {
@@ -320,6 +380,7 @@ function Tile(T, L, status, type) {
 
 		this.makeAllTileDroppable = function(divs, client) {
 			$("#board").find(divs).droppable({
+			// $("#board").find(divs).droppable({
 				accept: 'div.chip',
 				hoverClass: 'hovered',
 				drop: function(event, ui) {
@@ -375,32 +436,39 @@ function Tile(T, L, status, type) {
 						}
 					});
 
+						$("#board").hammer().on("doubletap", ".chip p", function(event) {
+					// $("#board").on('dblclick','.chip p', function() {	
+						var $chip = $(this).parent();
+						// Mimi.rack.sendInvalidBackToRack([$chip])
+						console.log($chip +"-status- :"+$chip.attr("data-status"));
+						if ($chip.attr("data-status") != "disabled") {
+							$chip.attr("data-status", "active")
+								.attr("data-row", null)
+								.attr("data-col", null);
+
+							$chip.removeAttr("style");
+							$chip.addClass("is-BackOnRack").css('background','rgb(242, 242, 242)').removeClass("is-OnBoard").detach()
+							// console.log($chip.data('type'));
+							if ($chip.data('type') == "num") $('#rack ul li:nth-child(1)').append($chip);
+							if ($chip.data('type') == "op") $('#rack ul li:nth-child(2)').append($chip);
+							if ($chip.data('type') == ("eq"||"symbol")) $('#rack ul li:nth-child(3)').append($chip);
+
+							client.usedChip = client.usedChip.filter(function(v) {
+								return v.attr('id') == $chip.attr('id') ? false : true;
+							}); //remove from usedChip if we remove the chip from the board
+						}
+					});
+
+
 					
 
 					if ($(this).children('div').length == 0) {
-						// ui.draggable.css({
-						// 					position: "absolute",
-						// 					left: 0 + "px",
-						// 					top: 0 + "px",
-						// 					zIndex: 1,
-						// 					width:"200px",
-						// 					height:"200px"
-						// 			});
 						ui.draggable.removeAttr("style");
 						ui.draggable.addClass("is-OnBoard").css({width:CSSs.cell_w,height:CSSs.cell_h});
 						ui.draggable.detach();
 						$(this).append(ui.draggable);
 					} else {
 						console.log(ui.draggable.data()); // check minor bug with data row and col bein null if we drag to a busy tile
-						// console.log(ui.draggable.parent());
-						// ui.draggable.css({
-						// 	"width": "200px",
-						// 	"height": "200px"
-						// });
-
-						// console.log("Rejected !! line 301");
-						// console.log($(this).children('div').length);
-						// console.log(ui.draggable.parent()[0].id);
 						var $parentId = ui.draggable.parent().parent().parent()[0].id;
 
 						if ($(this).children('div').length == 1 && $parentId == 'rack') { // revert if going to rack
@@ -460,24 +528,8 @@ function visualFeedback(res, val, ui){
 	this.GetSelf = function() {
 			return pGetSelf();
 	};
-
-	// this.animate = function () {
-	// 	$self.animate({
-	// 			'top': '-='+ (CSSs.cell_h +100)+'px',
-	// 			'opacity':"0",
-	// 			'font-size':'20em',
-	// 			'position':"absolute"
-	// 		},2500, function() {
-	// 		    // Animation complete - reset visualFB.
-	// 		   $(this).css({"font-size":"4em"}).text("");
-	// 		});
-	// }
-
-	// return this;
 }
-// visualFeedback.prototype.reset = function  () {
-// 	return r_set();
-// }
+
 /*================================================================================================*/
 /*
 0 = empty
@@ -492,19 +544,6 @@ board (div, row, column,  cell height, cell width ,  width -pixel , height -pixe
 function Board (divName,r,c,ch,cw,w,h) {
 		'use strict';
 			$(divName).css({"width":Game.viewport.width,"height":Game.viewport.height});
-			// this.width =$(divName).width();
-			// this.height =$(divName).height();
-			// CSSs.cell_h = ch || CSSs.cell_h;
-			// CSSs.cell_w = cw || CSSs.cell_w;
-			// this.cnt = 0;
-			// this.DOM_element = divName;
-			// this.tileSet = [];
-			// this.patternStr = "";
-			// this.cols =  Math.ceil(this.width / CSSs.cell_w);
-			// this.rows = Math.ceil(this.height / CSSs.cell_h);
-
-//			console.log(this.width);
-
 			this.width = w || $(divName).width();
 			this.height = h || $(divName).height();
 			CSSs.cell_h = ch || CSSs.cell_h;
@@ -897,34 +936,17 @@ function ChipHolder(_DOM_element) {
 		for (var i = rack_num.children().length ; i < _num ; i++) {
 			rack_num.append(number[i].GetSelf()[0]);
 		}
-		// rack.append(num);
 
 		for (var i = rack_sign.children().length ; i < _op ; i++) {
 			rack_sign.append(opSign[i].GetSelf()[0]);
 		}
-		// rack.append(op);
 
 		for (var i = rack_eq.children().length ; i < _Eq ; i++) {
 			rack_eq.append(eqSign[i].GetSelf()[0]);
 		}
-		// rack.append(eq);
 
 	};
 
-	// /* push the new chips onto the rack*/
-	// this.getChips = function( ) {
-	// 	for (var i = number.length - 1; i >= 0; i--) {
-	// 		$(this.DOM_element).append(number[i].GetSelf()[0]);
-	// 	}
-
-	// 	for (var x in opSign) {
-	// 		$(this.DOM_element).append(opSign[x].GetSelf()[0]);
-	// 	}
-
-	// 	for (var y in eqSign) {
-	// 		$(this.DOM_element).append(eqSign[y].GetSelf()[0]);
-	// 	}
-	// };
 
 	/* push the new chips onto the rack*/
 	this.getChips = function( ) {
@@ -1052,14 +1074,15 @@ var Client = function (name,homeTile) {
 		return self;		
 	};
 
+	//bring the hometile into the view port
+	this.bringToView = function(){
+		var self = $(homeTile),
+			top = self.position().top,
+			left = self.position().left;
 
-	// this.printUsedTile = function (argument) {
-	// 	var currChip="";
-	// 	for (var i = this.usedChip.length - 1; i >= 0; i--) {
-	// 		currChip +=" "+ $(this.usedChip[i]).html();
-	// 	}
-	// 	return currChip;
-	// };
+		$("html, body").animate({ scrollTop: ""+top+"px", scrollLeft:""+left+"px" },2000, 'easeOutQuad' );
+	}
+
 
 	function getChipNeighbor (orientation,element){
 		var Row = parseInt($(element).attr('data-row'), 10);    // (10) here is the radix parameter for parseInt
@@ -1078,26 +1101,6 @@ var Client = function (name,homeTile) {
 	}
 
 
-  	// inspired by http://stackoverflow.com/a/4580171/623546
- //    this.degradingRadiant = function  (argument,_time) {
- //    	var red1 = parseInt(argument,16) >> 16;
- //    	var green1 = (parseInt(argument,16) >> 8) & 0xFF;
- //    	var blue1  =  parseInt(argument,16) & 0xFF;
-
-	//     var time = _time; // This should be between 0 and 1
-	//     var red2 = 0xFFFFFF >> 16;
-	//     var green2 = (0xFFFFFF >> 8) & 0xFF;
-	//     var blue2  = 0xFFFFFF & 0xFF;
-
-	//     var outred = time * red1 + (1-time) * red2;
-	//     var outgreen = time * green1 + (1-time) * green2;
-	//     var outblue = time * blue1 + (1-time) * blue2;
-	//     var hexColor = "#"+((1 << 24) + (outred << 16) + (outgreen << 8) + outblue).toString(16).substr(1);
-	// 	return  hexColor ;
-
-	// };
-
-	//this.lpcnt = 0;
 	/* this function will traverse the usedChip array by looking a chip neighbor */
 	this.traverseUsedChip = function (direction,orientation,chip) {
 		var neighbor = chip;
@@ -1107,10 +1110,11 @@ var Client = function (name,homeTile) {
 			return 0 ;
 		else
 			{//var col ;
+		          if(neighbor.attr('data-status')!='disabled')
+		          		neighbor.css({"background-color":"#434532"}); //evaluation color
 				if (direction == "horizontal"){
 		          // console.log( col = this.degradingRadiant("7B3F00 ",this.lpcnt));
 		          // neighbor.css({"background-color":col});
-		          neighbor.css({"background-color":"green"}); //evaluation color
 		         // console.log("orientation " + orientation);
           			if (orientation == "left"){
 
@@ -1147,70 +1151,53 @@ var Client = function (name,homeTile) {
 		};
 
 	/* we are going from the last chip*/
-	this.validate = function() {
-
-		//
-		if (this.usedChip.length === 0)
+this.validate = function() {
+	var cur = this.usedChip.length - 1;
+	if (this.usedChip.length == 0){
+		console.log("no tile used")
 			return -1;
-		else {
-			var  direction = "",
-						LN = getChipNeighbor('left',(this.usedChip[this.usedChip.length -1 ]))	||null,//all available neighbor for the last chip
-						RN = getChipNeighbor('right',(this.usedChip[this.usedChip.length -1 ]))	||null,
-						TN = getChipNeighbor('top',(this.usedChip[this.usedChip.length -1 ]))	||null,
-						BN = getChipNeighbor('bottom',(this.usedChip[this.usedChip.length -1 ]))||null;
+	}
+	else 
+	for ( ;cur > 0  ; cur--) {
+		var  direction = "",
+			LN = getChipNeighbor('left',(this.usedChip[cur]))	||null,//all available neighbor for the last chip
+			RN = getChipNeighbor('right',(this.usedChip[cur]))	||null,
+			TN = getChipNeighbor('top',(this.usedChip[cur]))	||null,
+			BN = getChipNeighbor('bottom',(this.usedChip[cur])) ||null;
 
-			console.log("last used CHip :"+this.usedChip[this.usedChip.length -1 ].html());
+			console.log("last used CHip :"+this.usedChip[cur].html());
 			if ((LN.length === 0 ? (RN.length === 0 ? false : true) : true )){
 				direction = "horizontal";
 				this.traverseUsedChip (direction,"left",LN);
 
-				//collect the chip for validation
-				this.equationChip.push(this.usedChip[this.usedChip.length -1 ]);
-				console.log(this.equation += $(this.usedChip[this.usedChip.length -1 ]).html()+"|");
+			//collect the chip for validation
+			this.equationChip.push(this.usedChip[cur]);
+			console.log(this.equation += $(this.usedChip[cur]).html()+"|");
 
-				this.traverseUsedChip (direction,"right",RN);
-			}
-			else {
-					if ((TN.length === 0 ? (BN.length === 0 ? false : true) : true )){
-					direction = "vertical";
-					this.traverseUsedChip (direction,"top",TN);
-
-					this.equationChip.push(this.usedChip[this.usedChip.length -1 ]);
-					console.log(this.equation += $(this.usedChip[this.usedChip.length -1 ]).html()+"|");
-
-					this.traverseUsedChip (direction,"bottom",BN);
-				}
-			}
-
+			this.traverseUsedChip (direction,"right",RN);
 		}
-// console.log(this.equation);
-		console.log(this.usedChip);
+		else {
+			if ((TN.length === 0 ? (BN.length === 0 ? false : true) : true )){
+				direction = "vertical";
+				this.traverseUsedChip (direction,"top",TN);
+
+				this.equationChip.push(this.usedChip[cur]);
+				console.log(this.equation += $(this.usedChip[cur]).html()+"|");
+
+				this.traverseUsedChip (direction,"bottom",BN);
+			}
+		}
+
 		var $weightedEquation = [];
 		for (var i = 0; i < this.equationChip.length; i++) {
-			 $weightedEquation.push(myBoard.applyPatternForValidation(this.equationChip[i]));
+			$weightedEquation.push(myBoard.applyPatternForValidation(this.equationChip[i]));
 		};
-			 console.log($weightedEquation);
-
-		console.log("let's parse the equation: ");
-
+		console.log($weightedEquation);
+		console.log("let's parse the equation: "+ cur );
 		var equation = this.equation.replace(/<\/?[^>]+(>|$)/g, ""); //remove span tags
-		// console.log(equation);
-		// 	equation = equation.replace(/\|/g,''); //remove | delimiter
 		console.log(equation);
-		
-			// console.log(this.equationChip.toString());
-			var chipStr = printChips(this.equationChip);
-			// printChips($weightedEquation[0]);
-			// printC
 	
-			//printChips($weightedEquation);
-			// console.log(this.equationChip.toString());
-			// var result = this.parseEquation(equation);
-			// var result = this.parseEquation($weightedEquation[0]);
-			// console.log(this.parseEquation("3=3=3"));
-			// console.log(this.parseEquation("3+2*2=7+9-8-1=2*3+1"));
-			// console.log(this.parseEquation("2=2=2+1"));
-			// console.log(result);
+		var chipStr = printChips(this.equationChip);
 		try{
 
 		}catch(e){
@@ -1218,14 +1205,12 @@ var Client = function (name,homeTile) {
 			this.rack.sendInvalidBackToRack (this.usedChip);
 		}
 
-		// console.log(result);
-		console.log($(this.usedChip[this.usedChip.length -1 ]));
-			var result = 0;
+		var result = 0;
+		
 		if ( (result = Game.rulesValidator ($weightedEquation,chipStr)) != undefined ){//  validation condition
-			// if(isNaN(result))
 			this.setScore(result);
 			$('#info span').text(this.getScore());
-			var visualFB = new visualFeedback(true ,result, $(this.usedChip[this.usedChip.length -1 ]))
+			var visualFB = new visualFeedback(true ,result, $(this.usedChip[cur]))
 			visualFB.GetSelf().animate({
 				'top': '-='+ (CSSs.cell_h +100)+'px',
 				'opacity':"0",
@@ -1233,17 +1218,15 @@ var Client = function (name,homeTile) {
 				'position':"absolute"
 			},2500, function() {
 			    // Animation complete - reset visualFB.
-			   $(this).css({"font-size":"4em"}).text("");
+			 
+			    $(this).css({"font-size":"4em"}).text("");
 			});
 			this.rack.refill(7,4,1);
-			// this.rack.reset();
 			this.disable_on_validation();
-			// this.rack.makeNewSet(7,4,1);
-			// this.rack.getChips();
-			// visualthis.FB.reset();
+		
 		}else{  // invalid equation
 			result ="Yo mama would be ashamed!!!"
-			var visualFB = new visualFeedback(false ,result, $(this.usedChip[this.usedChip.length -1 ]))
+			var visualFB = new visualFeedback(false ,result, $(this.usedChip[cur]))
 			visualFB.GetSelf().animate({
 				'top': '-='+ (CSSs.cell_h +100)+'px',
 				'opacity':"0",
@@ -1251,29 +1234,29 @@ var Client = function (name,homeTile) {
 				'position':"absolute"
 			},2500, function() {
 			    // Animation complete - reset visualFB.
-			   $(this).css({"font-size":"4em"}).text("");
+			    $(this).css({"font-size":"4em"}).text("");
 			});
 		}
 		this.equation = "";
-		this.usedChip =[];
-		// console.log(this.equationChip);
 		this.equationChip = [];
 	};
+	this.usedChip =[];
+};
 	this.disable_on_validation = function () {
 		for (var i = 0; i < this.equationChip.length; i++) {
 			this.equationChip[i].draggable("disable").css({opacity: 0.9 ,"background-color":"gray","border-color":"dark-gray"});  // prevent validated tiles to be moved
 			this.equationChip[i].attr("data-status","disabled");
 			this.equationChip[i].unbind('dblclick'); // remove dblclick event
 		};
-	};
+	};  
 	this.parseEquation = function (_myEquation) {
 		var equation = _myEquation.toString(); // convert array to string
-		console.log(equation);
-			equation = equation.replace(/<\/?[^>]+(>|$)/g, ""); //remove span tags
-		console.log(equation);
-			equation = equation.replace(/\|/g,''); //remove | delimiter
-			equation = equation.replace(/\,/g,''); //remove | delimiter
-		console.log(equation);
+		// console.log(equation);
+		equation = equation.replace(/<\/?[^>]+(>|$)/g, ""); //remove span tags
+		// console.log(equation);
+		equation = equation.replace(/\|/g,''); //remove | delimiter
+		equation = equation.replace(/\,/g,''); //remove | delimiter
+		// console.log(equation);
 
 		// return EquationParser.parse(_myEquation);  //Peg.js generated grammar parser
 		return EquationParser.parse(equation);  //Peg.js generated grammar parser
@@ -1291,10 +1274,15 @@ function printChips (Arr) {
 }
 /*================================================================================================*/
 
+	var row = Math.ceil(Game.viewport.height/CSSs.cell_h),
+		col = Math.ceil(Game.viewport.width/CSSs.cell_w);
 // board (div, row, column,  cell height, cell width ,  width -pixel , height -pixel)
-	var myBoard = new Board("#board",15,15);
+	// var myBoard = new Board("#board",20,20);
+	console.log("col"+col+"row"+row);
+	var myBoard = new Board("#board",col,col);
 	myBoard.buildGrid("#board",CSSs,0,0);
-	Mimi = new Client("Mimi","#tile_34"); //tile_34 = home tile
+	Mimi = new Client("Mimi","#tile_5"); //tile_34 = home tile
+	Mimi.bringToView();
 	Game.setWorldDim();
 	$('#board').draggable({ //will be move into Board class soon
 		// drag: function (event, ui) {

@@ -1,6 +1,8 @@
 watcher.ps1
 game.js
 server.js
+js/random*
+js/road*
 .gitignore
 .htaccess
 .git

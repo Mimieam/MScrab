@@ -36,6 +36,7 @@
 
     
         <div id = "rack"> </div>
+        <div  class="ResetBtn" type=button onclick="Game.chipReset()"> <p>Reset</p> </div> 
         <div  class="GoBtn" type=button onClick="Game.validateBoard()"> <p>Go</p> </div> 
      </div>
     <!-- <div class = "zone"> -->
@@ -55,7 +56,8 @@
     <!-- // <script src="https://raw.github.com/furf/jquery-ui-touch-punch/master/jquery.ui.touch-punch.min.js"></script> -->
     <script src="js/libs/jquery.min.js"></script>
     <script src="js/libs/jquery-ui.min.js"></script>
-    <script src="js/libs/jquery.ui.touch-punch.min.js"></script>
+    // <script src="js/libs/jquery.ui.touch-punch.min.js"></script>
+    <script type="text/javascript" src="js/libs/jquery.hammer.min.js"></script>
     <!-- // <script src="https://jquery-ui-for-ipad-and-iphone.googlecode.com/svn/trunk/jquery.ui.ipad.js"></script> -->
 
     <!-- <script src="http://ianli.com/infinitedrag/javascripts/jquery.infinitedrag.js"></script> -->
@@ -63,6 +65,20 @@
     <!-- // <script src="js/parser.js"></script> -->
     <script src="js/parser_new.js"></script>
     <script src="js/client.js"></script>
+
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-32106511-1']);
+      _gaq.push(['_setDomainName', 'google.com']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
 
 </body>
 </html>
