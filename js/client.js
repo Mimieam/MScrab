@@ -230,9 +230,13 @@ Game.rulesValidator = function (Arr, ArrValues_str , name) {
 			// return EquationParser.parse(_myEquation);  //Peg.js generated grammar parser
 			console.log("equation Left handside"+equation.split('=')[0])
 			  //return the left handside of the equation - EVIL EVAL - I will change this monstruositywhen i'm rested ...
+<<<<<<< HEAD
 		try{
 			return (EquationParser.parse(equation) ? eval(equation.split('=')[0]):"FAILED");  //Peg.js generated grammar parser
+=======
+>>>>>>> clean up and minor fix
 		try{
+			return (EquationParser.parse(equation) ? eval(equation.split('=')[0]):"FAILED");  //Peg.js generated grammar parser
 		
 		}catch(e){
 			console.error(e);
@@ -1103,6 +1107,7 @@ var Client = function (name,homeTile) {
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   	// inspired by http://stackoverflow.com/a/4580171/623546
  //    this.degradingRadiant = function  (argument,_time) {
@@ -1134,6 +1139,8 @@ var Client = function (name,homeTile) {
 			// this.rack.getChips();
 	// });
 >>>>>>> added reset btn
+=======
+>>>>>>> clean up and minor fix
 	/* this function will traverse the usedChip array by looking a chip neighbor */
 	this.traverseUsedChip = function (direction,orientation,chip) {
 		var neighbor = chip;
@@ -1145,10 +1152,14 @@ var Client = function (name,homeTile) {
 			{//var col ;
 		          if(neighbor.attr('data-status')!='disabled')
 <<<<<<< HEAD
+<<<<<<< HEAD
 		          		neighbor.css({"background-color":"#434532"}); //evaluation color
 =======
 		          		neighbor.css({"background-color":"green"}); //evaluation color
 >>>>>>> added reset btn
+=======
+		          		neighbor.css({"background-color":"#434532"}); //evaluation color
+>>>>>>> clean up and minor fix
 				if (direction == "horizontal"){
 		          // console.log( col = this.degradingRadiant("7B3F00 ",this.lpcnt));
 		          // neighbor.css({"background-color":col});
