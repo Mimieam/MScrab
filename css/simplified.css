@@ -95,6 +95,7 @@ body {
       padding-left:42%;
     }
 
+.ResetBtn,
 .GoBtn {
   -moz-box-shadow:inset 0px 0px 9px 0px #ffffff;
   -webkit-box-shadow:inset 0px 0px 9px 0px #ffffff;
@@ -115,12 +116,16 @@ body {
   padding:6px 0px;
   text-decoration:none;
   text-shadow:1px 0px 27px #ffffff;
-}.GoBtn:hover {
+}
+.ResetBtn:hover,
+.GoBtn:hover {
   background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ffffff) );
   background:-moz-linear-gradient( center top, #dfdfdf 5%, #ffffff 100% );
   filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ffffff');
   background-color:#dfdfdf;
-}.GoBtn:active {
+}
+.ResetBtn:active,
+.GoBtn:active {
   position:relative;
   top:1px;
 }
