@@ -230,11 +230,6 @@ Game.rulesValidator = function (Arr, ArrValues_str , name) {
 			// return EquationParser.parse(_myEquation);  //Peg.js generated grammar parser
 			console.log("equation Left handside"+equation.split('=')[0])
 			  //return the left handside of the equation - EVIL EVAL - I will change this monstruositywhen i'm rested ...
-<<<<<<< HEAD
-		try{
-			return (EquationParser.parse(equation) ? eval(equation.split('=')[0]):"FAILED");  //Peg.js generated grammar parser
-=======
->>>>>>> clean up and minor fix
 		try{
 			return (EquationParser.parse(equation) ? eval(equation.split('=')[0]):"FAILED");  //Peg.js generated grammar parser
 		
@@ -1106,41 +1101,6 @@ var Client = function (name,homeTile) {
 	}
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  	// inspired by http://stackoverflow.com/a/4580171/623546
- //    this.degradingRadiant = function  (argument,_time) {
- //    	var red1 = parseInt(argument,16) >> 16;
- //    	var green1 = (parseInt(argument,16) >> 8) & 0xFF;
- //    	var blue1  =  parseInt(argument,16) & 0xFF;
-
-	//     var time = _time; // This should be between 0 and 1
-	//     var red2 = 0xFFFFFF >> 16;
-	//     var green2 = (0xFFFFFF >> 8) & 0xFF;
-	//     var blue2  = 0xFFFFFF & 0xFF;
-
-	//     var outred = time * red1 + (1-time) * red2;
-	//     var outgreen = time * green1 + (1-time) * green2;
-	//     var outblue = time * blue1 + (1-time) * blue2;
-	//     var hexColor = "#"+((1 << 24) + (outred << 16) + (outgreen << 8) + outblue).toString(16).substr(1);
-	// 	return  hexColor ;
-
-	// };
-
-	//this.lpcnt = 0;
-
-
-
-	// $(".ResetBtn").on("click",function () {
-			// Game.rack.reset();
-			// this.rack.makeNewSet(7,4,1);
-			// this.rack.getChips();
-			// this.rack.getChips();
-	// });
->>>>>>> added reset btn
-=======
->>>>>>> clean up and minor fix
 	/* this function will traverse the usedChip array by looking a chip neighbor */
 	this.traverseUsedChip = function (direction,orientation,chip) {
 		var neighbor = chip;
@@ -1151,15 +1111,7 @@ var Client = function (name,homeTile) {
 		else
 			{//var col ;
 		          if(neighbor.attr('data-status')!='disabled')
-<<<<<<< HEAD
-<<<<<<< HEAD
 		          		neighbor.css({"background-color":"#434532"}); //evaluation color
-=======
-		          		neighbor.css({"background-color":"green"}); //evaluation color
->>>>>>> added reset btn
-=======
-		          		neighbor.css({"background-color":"#434532"}); //evaluation color
->>>>>>> clean up and minor fix
 				if (direction == "horizontal"){
 		          // console.log( col = this.degradingRadiant("7B3F00 ",this.lpcnt));
 		          // neighbor.css({"background-color":col});
@@ -1296,7 +1248,7 @@ this.validate = function() {
 			this.equationChip[i].attr("data-status","disabled");
 			this.equationChip[i].unbind('dblclick'); // remove dblclick event
 		};
-	};  
+	};
 	this.parseEquation = function (_myEquation) {
 		var equation = _myEquation.toString(); // convert array to string
 		// console.log(equation);
