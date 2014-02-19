@@ -65,3 +65,51 @@ an equation is true if
 
 Implementation details
  ☐ 
+
+
+ New twist:
+
+on drop of a chip on a tile -> mark that tile as active ( dropping logic is not cared for here yet) if the chip is moved/removed then desactivate the tile
+then when ready to validate - collect all the active tiles into a Set of pairs {x,y} where x and y are the row and column of each active tile
+So the validation will use this Unsorted Set as input. 
+
+
+  ☐ recursive check
+      check the first tile on the left and go up until no more tiles are met or an equal sign is encounter
+        if no more tile then stop and save that current equation
+          else if an equal sign is found, go all the way till another equal is meet or no more tiles anymore
+
+      4 
+=2+2=1+3=1+1+2=
+      2+
+   1+5=5+2-1=6
+      6=
+       8
+
+
+     don't use self aware tiles but simply grid.
+     track position of first and last tile drop 
+
+ ☐ get primary new equation  ( the one the player entered)
+     use tile set, {[x,y],[x,y],[x,y],....,[x,y]} add/remove each time a chip is put/remove on/from the board.
+
+     if direction is horizontal ( if all y are equal)
+       then sort set by x
+     else if vertical
+        then sort set by y
+     else
+         invalid equation not all tile were on the same direction
+
+     save min and max of set as  first and last element of the equation
+     return min and max of [x,y]'s called them Start and End ( respecivetly start of equation and u know...) and direction
+
+ ☐ get secondary equation ( derived from addition to new tiles to the old ones)
+     go from the Start, and make sets from adjacent tiles to the primary equation. 
+       if primary direction is horizontal 
+         then make verical set
+       else 
+              make horizontal set
+
+     secondary sets will collect enough to determine the correctness of the equation
+
+
