@@ -61,7 +61,6 @@ function _getOrientation (Set) {
 */
 function _getStartAndEndTiles(Set , orientation){
   if(orientation!="vertical"&&orientation!="horizontal"){ // should never be the case... but just to be safe^^
-    console.log("hellow ...");
     return null;
   }
   var highest = Set[0];
@@ -69,7 +68,7 @@ function _getStartAndEndTiles(Set , orientation){
   var Axis = (orientation[0]=='v' ? 'y' :'x');   // ok i did get lazy here... hey it's 1:25 AM.. well this says: if direction is vertical we check the y's
     // the start of the equation is the lowest end...  most right or bottom ...  ( but in the actuall evaluation it doesn't matter because the parser doesn't care of the direction of the equation only he oriendation) 
   
-  console.log(Axis, Set, highest[Axis])
+  // console.log(Axis, Set, highest[Axis])
   for(var i=1;i<Set.length;i++) {
     lowest   = (Math.min(lowest[Axis] , Set[i][Axis]) == lowest[Axis]  ? lowest  : Set[i] );     //Starting tile
     highest     = (Math.max(highest[Axis], Set[i][Axis]) == highest[Axis] ? highest : Set[i] );  //Ending tile
@@ -156,7 +155,9 @@ function genEquation (Set, hardSetOrientation) {
 // // console.log("myEQ -->\n" , myEQ)
 
 
-console.log(validate([{x:0,y:4},{x:3,y:4}]))
+// console.log(validate([{x:0,y:4},{x:3,y:4}]))
+// console.log(validate([{x:4,y:0},{x:9,y:0}]))
+console.log(validate([{x:2,y:3},{x:2,y:8}]))
 /*  !!! - This function efficiency can be altered depending on how the DOM elements are accessed...
   This function will expand an equation to capture all
   used and disabled tile that are connected to the new equation 
@@ -171,8 +172,6 @@ console.log(validate([{x:0,y:4},{x:3,y:4}]))
 
 function extendEquation(equation){
   eq = _getExtendedStartAndEndTiles(equation.Start, equation.End)
-
-
 }
 
 function _getExtendedStartAndEndTiles(Start, End, hardSetOrientation) {
@@ -181,7 +180,7 @@ function _getExtendedStartAndEndTiles(Start, End, hardSetOrientation) {
     return null
   }
   orientation = typeof hardSetOrientation !== 'undefined'? hardSetOrientation:  _getOrientation([Start,End]);
-  console.log("orientation from extended ==>", orientation)
+  // console.log("orientation from extended ==>", orientation)
   // shortcut for bypassing extending equation with 
   
   var newStart = Start,
@@ -191,12 +190,12 @@ function _getExtendedStartAndEndTiles(Start, End, hardSetOrientation) {
     newEnd.type = "End";
     newEnd.x= End.x;
     newEnd.y= End.y;
-    if (Start == End){
-      console.log("STARTING TILE == ENDING TILE");
-    }
+    // if (Start == End){
+    //   console.log("STARTING TILE == ENDING TILE");
+    // }
 
-    console.log("newStart", newStart);
-    console.log("newEnd", newEnd);
+    // console.log("newStart", newStart);
+    // console.log("newEnd", newEnd);
 
   //find new Start / End coordinate
 
@@ -248,15 +247,20 @@ function _getTileStateAndContent(x,y) {
 
 
 function evaluate_equation_string (equation) {
-  console.log("evaluating this equation\n", equation)
+  // console.log("evaluating this equation\n", equation)
   if (equation == null)
-    return false
-  components = equation._toString.split("=")
-  current_result = eval(components[0])
-  for (var i = components.length - 1; i >= 1; i--) {
-    if (eval(components[i]) != current_result)
-      return {"status":false, "score":0}
-  };
+    return {"status":false, "score":0}
+  try{
+    components = equation._toString.split("=")
+    current_result = eval(components[0])
+    for (var i = components.length - 1; i >= 1; i--) {
+      if (eval(components[i]) != current_result)
+        return {"status":false, "score":0}
+    };
+  } catch(e){
+    console.log("INVALID EQUATION ",equation._toString , e )
+        return {"status":false, "score":0}
+  }
   return {"status":true, "score":current_result*components.length}
 }
 
@@ -284,26 +288,32 @@ function validate (Set) {
 
     return _computePoints([set of all equations])
 */
-  isValid = true
-  primaryEq = genEquation(Set)
-  isValid = _validate_a_single_equation(primaryEq).status
+  isValid = true;
+  primaryEq = genEquation(Set);
+  result = _validate_a_single_equation(primaryEq);
+
+  isValid = result.status;
+  score = result.score;
+  console.log(result);
   for (var TileIndex = primaryEq.ActualSet.length - 1; TileIndex >= 0; TileIndex--) {
     if (isValid == true){ 
-      // secondaryEq = _getExtendedStartAndEndTiles(primaryEq.ActualSet[TileIndex], primaryEq.ActualSet[TileIndex]) // use same time to generate secondaty equation
-      // console.log("ActualSet - >",primaryEq.ActualSet)
       secondaryEq = genEquation([primaryEq.ActualSet[TileIndex]], _axis_to_orientation(primaryEq.otherAxis)) // use same time to generate secondaty equation
-      console.log("secondary equations",secondaryEq)
-      if (secondaryEq != null)
-        isValid = _validate_a_single_equation(secondaryEq).status
-        if (isValid != true){
-          return false
+      // console.log("secondary equations",secondaryEq)
+      console.log(secondaryEq._toString)
+      if (secondaryEq != null && secondaryEq._toString.length > 1){
+          other_result = _validate_a_single_equation(secondaryEq)
+          if (other_result.status != true){
+            return other_result;
+          }
         }
+      else{
+        console.log("evaluation skiped because lenght of this string is less than 1, string = (", secondaryEq._toString,")")
+
+      }
     }
   };
-
-  return isValid
-
-
+  console.log(result);
+  return result;
 
 }
 
@@ -395,15 +405,15 @@ function makeFakeBoard (MaxR,MaxC) {
 function getFakeBoard (board, noCoordinate) {
   // var board = makeFakeBoard(Max);
   var b = "";
-  console.log("{x,y}")
+  // console.log("{x,y}")
   board.every(function (row, index, array){
   // console.log(row) 
     row.every(function (obj, i, a){
       if(noCoordinate != undefined)
       b+= obj.content+' ';
       else         
-      b+='{'+obj.x+','+obj.y+'} '+obj.content+' ';
-      // console.log(obj);
+      // b+='{'+obj.x+','+obj.y+'} '+obj.content+' ';
+      b += obj.content + ' ';
       return true;
     });
     b+='\n';
@@ -414,19 +424,32 @@ function getFakeBoard (board, noCoordinate) {
 
 
 function putOnBoard (row,col,_content,board) {
-  board[row][col] = {
-          x:col,
-          y:row ,
-          state: "disabled",
-          content: _content
-        }
-}
+
+  if (board[row][col].state != "disabled"){
+      board[row][col] = {
+              x:col,
+              y:row ,
+              state: "disabled",
+              content: _content
+            }
+      console.log(col, row, board[row][col] )
+    }
+    else{
+      console.log("Tile already in use")
+    }
+  }
+
+
 /*
   lay down an equation on our fake board
   input : orientation, starting row and column, the string to be placed and the board on which t goes on
   return: board
 */
 function layItAllDown (orientation, row,col, str,board) {
+  var initial_R = row,
+      initial_C = col;
+      inital_STR = str
+
   while(str!="")
   {
     if(str[0]==' ') 
@@ -440,7 +463,22 @@ function layItAllDown (orientation, row,col, str,board) {
     }
     str = str.slice(1); // first element has been consumed.
   }
+  // console.log(orientation, initial_R, initial_C, str)
+  console.log(check_and_lay(orientation, initial_R, initial_C, inital_STR))
   getFakeBoard(board);
+}
+
+function check_and_lay (orientation, row, col, str) {
+  var newX = col,
+      newY = row
+  if (orientation[0] == 'h') 
+    newX += str.length -1
+  else
+    newY += str.length -1 
+
+  // console.log( newX, newY, [{x: col, y: row}, {x: newX, y: newY}], str, orientation)
+
+  return validate([{x: col, y: row}, {x: newX, y: newY}])
 }
 
 
@@ -455,12 +493,4 @@ function layItAllDown (orientation, row,col, str,board) {
 // {8,0} . {8,1} . {8,2} . {8,3} . {8,4} . {8,5} . {8,6} . {8,7} . {8,8} . 
 
 // FAKE TESTING BOARD Functions
-
-
-
-
-//     console.log(orientation);
-//     console.log(tmp);
-//       console.log( newTile[primary.Axis] +"=="+ i+ "==" + primary.ActualSet[primary.ActualSet.length-1][primary.Axis] );
-//     console.log(primary.ActualSet);
 
